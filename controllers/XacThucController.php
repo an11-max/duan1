@@ -219,16 +219,6 @@ class XacThucController
         }
     }
 
-    // Kiểm tra quyền super admin
-    private function checkSuperAdminPermission()
-    {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'super_admin') {
-            $_SESSION['error'] = 'Bạn không có quyền truy cập chức năng này';
-            header('Location: index.php?act=admin-dashboard');
-            exit;
-        }
-    }
-
     // Kiểm tra đăng nhập
     public static function checkLogin()
     {
