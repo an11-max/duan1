@@ -69,7 +69,7 @@ class QuanTriController
     public function addTour()
     {
         // Chỉ admin và super admin được thêm tour
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tour_code = $_POST['tour_code'];
@@ -96,7 +96,7 @@ class QuanTriController
     public function editTour()
     {
         // Chỉ admin và super admin được sửa tour
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $id = $_GET['id'];
         
@@ -132,7 +132,7 @@ class QuanTriController
     public function deleteTour()
     {
         // Chỉ admin và super admin được xóa tour
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $id = $_GET['id'];
         $tour = $this->tourModel->getTourById($id);
@@ -149,14 +149,14 @@ class QuanTriController
     // Quản lý Bookings - chỉ admin và super admin
     public function listBookings()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         $bookings = $this->datTourModel->getAllBookings();
         require_once './views/quantri/bookings/list.php';
     }
 
     public function addBooking()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $customer_id = $_POST['customer_id'];
             $booking_code = $_POST['booking_code'];
@@ -179,7 +179,7 @@ class QuanTriController
 
     public function editBooking()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         $id = $_GET['id'];
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -205,7 +205,7 @@ class QuanTriController
 
     public function deleteBooking()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         $id = $_GET['id'];
         $this->datTourModel->deleteBooking($id);
         header('Location: ' . BASE_URL . '?act=admin-bookings');
@@ -215,14 +215,14 @@ class QuanTriController
     // Quản lý Customers - chỉ admin và super admin
     public function listCustomers()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         $customers = $this->khachHangModel->getAllCustomers();
         require_once './views/quantri/customers/list.php';
     }
 
     public function addCustomer()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = $_POST['name'];
             $phone = $_POST['phone'];
@@ -242,7 +242,7 @@ class QuanTriController
 
     public function editCustomer()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         $id = $_GET['id'];
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -266,7 +266,7 @@ class QuanTriController
 
     public function deleteCustomer()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         $id = $_GET['id'];
         $this->khachHangModel->deleteCustomer($id);
         header('Location: ' . BASE_URL . '?act=admin-customers');
@@ -276,7 +276,7 @@ class QuanTriController
     // Quản lý Departures - chỉ admin và super admin
     public function listDepartures()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         $departures = $this->khoiHanhModel->getAllDepartures();
         require_once './views/quantri/departures/list.php';
     }
@@ -284,7 +284,7 @@ class QuanTriController
     // Quản lý Tour Guides - chỉ admin và super admin
     public function listTourGuides()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         $tourGuides = $this->huongDanVienModel->getAllTourGuides();
         require_once './views/quantri/tour_guides/list.php';
     }
@@ -292,7 +292,7 @@ class QuanTriController
     // Workflow Management
     public function workflowManagement()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         // Include WorkflowModel
         if (!class_exists('WorkflowModel')) {
@@ -325,7 +325,7 @@ class QuanTriController
     
     public function approveRequest()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
@@ -352,7 +352,7 @@ class QuanTriController
     
     public function rejectRequest()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
@@ -380,7 +380,7 @@ class QuanTriController
     
     public function assignTour()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
@@ -414,7 +414,7 @@ class QuanTriController
     // Hiển thị danh sách booking assignments
     public function bookingAssignments()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $user_id = $_SESSION['user']['id'];
         $role = $_SESSION['user']['role'];
@@ -430,7 +430,7 @@ class QuanTriController
     // Form gửi booking cho HDV
     public function assignBookingForm()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $booking_id = $_GET['booking_id'] ?? null;
         if (!$booking_id) {
@@ -454,7 +454,7 @@ class QuanTriController
     // Xử lý gửi booking cho HDV
     public function processBookingAssignment()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $booking_id = $_POST['booking_id'];
@@ -494,7 +494,7 @@ class QuanTriController
     // Xem chi tiết booking assignment
     public function viewBookingAssignment()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $assignment_id = $_GET['id'] ?? null;
         if (!$assignment_id) {
@@ -520,7 +520,7 @@ class QuanTriController
     // Hủy booking assignment
     public function cancelBookingAssignment()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $assignment_id = $_POST['assignment_id'];
@@ -549,7 +549,7 @@ class QuanTriController
     // Lấy thống kê booking assignments cho API
     public function getBookingAssignmentStats()
     {
-        AuthController::checkAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $user_id = $_SESSION['user']['id'];
         $role = $_SESSION['user']['role'];
