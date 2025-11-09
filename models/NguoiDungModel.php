@@ -8,10 +8,15 @@ class NguoiDungModel
         $this->conn = connectDB();
     }
 
-    // Đăng nhập
+    // Đăng nhập với tăng cường bảo mật
     public function login($username, $password)
     {
         try {
+            // Kiểm tra số lần đăng nhập thất bại
+            if ($this->isAccountLocked($username)) {
+                return ['error' => 'Tài khoản đã bị khóa do đăng nhập sai quá nhiều lần. Vui lòng thử lại sau 15 phút.'];
+            }
+
             $sql = "SELECT * FROM users WHERE username = :username AND status = 'active'";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':username', $username);
@@ -20,11 +25,82 @@ class NguoiDungModel
             $user = $stmt->fetch();
             
             if ($user && password_verify($password, $user['password'])) {
+                // Reset failed attempts khi đăng nhập thành công
+                $this->resetFailedAttempts($username);
+                // Cập nhật last login
+                $this->updateLastLogin($user['id']);
                 return $user;
+            } else {
+                // Tăng số lần đăng nhập thất bại
+                $this->incrementFailedAttempts($username);
+                return false;
+            }
+        } catch (Exception $e) {
+            error_log("Lỗi đăng nhập: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Kiểm tra tài khoản có bị khóa không
+    private function isAccountLocked($username)
+    {
+        try {
+            $sql = "SELECT failed_attempts, last_failed_attempt FROM users WHERE username = :username";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            $user = $stmt->fetch();
+
+            if ($user && $user['failed_attempts'] >= 5) {
+                $lastAttempt = strtotime($user['last_failed_attempt']);
+                $now = time();
+                // Khóa 15 phút
+                if (($now - $lastAttempt) < 900) {
+                    return true;
+                }
             }
             return false;
         } catch (Exception $e) {
             return false;
+        }
+    }
+
+    // Tăng số lần đăng nhập thất bại
+    private function incrementFailedAttempts($username)
+    {
+        try {
+            $sql = "UPDATE users SET failed_attempts = failed_attempts + 1, last_failed_attempt = NOW() WHERE username = :username";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+        } catch (Exception $e) {
+            error_log("Lỗi cập nhật failed attempts: " . $e->getMessage());
+        }
+    }
+
+    // Reset số lần đăng nhập thất bại
+    private function resetFailedAttempts($username)
+    {
+        try {
+            $sql = "UPDATE users SET failed_attempts = 0, last_failed_attempt = NULL WHERE username = :username";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+        } catch (Exception $e) {
+            error_log("Lỗi reset failed attempts: " . $e->getMessage());
+        }
+    }
+
+    // Cập nhật thời gian đăng nhập cuối
+    private function updateLastLogin($userId)
+    {
+        try {
+            $sql = "UPDATE users SET last_login = NOW() WHERE id = :id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id', $userId);
+            $stmt->execute();
+        } catch (Exception $e) {
+            error_log("Lỗi cập nhật last login: " . $e->getMessage());
         }
     }
 
@@ -65,16 +141,82 @@ class NguoiDungModel
         }
     }
 
-    // Lấy danh sách users (chỉ super admin)
-    public function getAllUsers()
+    // Lấy danh sách users với phân trang và tìm kiếm
+    public function getAllUsers($page = 1, $limit = 10, $search = '', $role = '', $status = '')
     {
         try {
-            $sql = "SELECT id, username, email, full_name, role, status, created_at, avatar FROM users ORDER BY created_at DESC";
+            $offset = ($page - 1) * $limit;
+            
+            $sql = "SELECT id, username, email, full_name, role, status, created_at, last_login, avatar FROM users WHERE 1=1";
+            $params = [];
+            
+            if (!empty($search)) {
+                $sql .= " AND (username LIKE :search OR email LIKE :search OR full_name LIKE :search)";
+                $params[':search'] = "%$search%";
+            }
+            
+            if (!empty($role)) {
+                $sql .= " AND role = :role";
+                $params[':role'] = $role;
+            }
+            
+            if (!empty($status)) {
+                $sql .= " AND status = :status";
+                $params[':status'] = $status;
+            }
+            
+            $sql .= " ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
+            
             $stmt = $this->conn->prepare($sql);
+            
+            // Bind parameters
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            
             $stmt->execute();
             return $stmt->fetchAll();
         } catch (Exception $e) {
+            error_log("Lỗi lấy danh sách users: " . $e->getMessage());
             return [];
+        }
+    }
+
+    // Đếm tổng số users
+    public function countUsers($search = '', $role = '', $status = '')
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM users WHERE 1=1";
+            $params = [];
+            
+            if (!empty($search)) {
+                $sql .= " AND (username LIKE :search OR email LIKE :search OR full_name LIKE :search)";
+                $params[':search'] = "%$search%";
+            }
+            
+            if (!empty($role)) {
+                $sql .= " AND role = :role";
+                $params[':role'] = $role;
+            }
+            
+            if (!empty($status)) {
+                $sql .= " AND status = :status";
+                $params[':status'] = $status;
+            }
+            
+            $stmt = $this->conn->prepare($sql);
+            
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            
+            $stmt->execute();
+            $result = $stmt->fetch();
+            return $result['total'];
+        } catch (Exception $e) {
+            return 0;
         }
     }
 

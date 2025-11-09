@@ -1,12 +1,12 @@
 <?php
 
-class AuthController
+class XacThucController
 {
-    public $userModel;
+    public $nguoiDungModel;
 
     public function __construct()
     {
-        $this->userModel = new UserModel();
+        $this->nguoiDungModel = new NguoiDungModel();
     }
 
     // Hiển thị form đăng nhập
@@ -18,10 +18,10 @@ class AuthController
             exit;
         }
         
-        require_once './views/auth/login.php';
+        require_once './views/xacthuc/login.php';
     }
 
-    // Xử lý đăng nhập
+    // Xử lý đăng nhập với tăng cường bảo mật
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -29,7 +29,7 @@ class AuthController
             $password = $_POST['password'] ?? '';
             $errors = [];
 
-            // Validate
+            // Validate input
             if (empty($username)) {
                 $errors[] = 'Vui lòng nhập tên đăng nhập';
             }
@@ -38,16 +38,19 @@ class AuthController
             }
 
             if (empty($errors)) {
-                $user = $this->userModel->login($username, $password);
+                $result = $this->nguoiDungModel->login($username, $password);
                 
-                if ($user) {
-                    // Lưu thông tin user vào session
+                if (is_array($result) && isset($result['error'])) {
+                    // Tài khoản bị khóa
+                    $_SESSION['error'] = $result['error'];
+                } elseif ($result) {
+                    // Đăng nhập thành công
                     $_SESSION['user'] = [
-                        'id' => $user['id'],
-                        'username' => $user['username'],
-                        'email' => $user['email'],
-                        'full_name' => $user['full_name'],
-                        'avatar' => $user['avatar'],
+                        'id' => $result['id'],
+                        'username' => $result['username'],
+                        'email' => $result['email'],
+                        'full_name' => $result['full_name'],
+                        'avatar' => $result['avatar'],
                         'role' => $user['role']
                     ];
                     
@@ -257,21 +260,64 @@ class AuthController
         }
     }
 
-    // Danh sách users (chỉ super admin)
+    // Danh sách người dùng với tính năng nâng cao (chỉ super admin)
     public function userList()
     {
         $this->checkSuperAdminPermission();
-        $users = $this->userModel->getAllUsers();
-        require_once './views/auth/user-list.php';
+        
+        // Lấy tham số tìm kiếm và lọc
+        $page = max(1, intval($_GET['page'] ?? 1));
+        $limit = 12; // Hiển thị 12 users per page cho grid layout
+        $search = trim($_GET['search'] ?? '');
+        $role = $_GET['role'] ?? '';
+        $status = $_GET['status'] ?? '';
+        
+        // Lấy danh sách users với phân trang
+        $users = $this->nguoiDungModel->getAllUsers($page, $limit, $search, $role, $status);
+        
+        // Lấy tổng số users để tính pagination
+        $totalUsers = $this->nguoiDungModel->countUsers($search, $role, $status);
+        $totalPages = ceil($totalUsers / $limit);
+        
+        // Thống kê nhanh
+        $totalAllUsers = $this->nguoiDungModel->countUsers();
+        $activeUsers = $this->nguoiDungModel->countUsers('', '', 'active');
+        $adminUsers = $this->nguoiDungModel->countUsers('', 'admin', '') + $this->nguoiDungModel->countUsers('', 'super_admin', '');
+        $guideUsers = $this->nguoiDungModel->countUsers('', 'tour_guide', '');
+        
+        // Pagination data
+        $pagination = [
+            'current_page' => $page,
+            'total_pages' => $totalPages,
+            'total_users' => $totalUsers,
+            'limit' => $limit
+        ];
+        
+        require_once './views/xacthuc/user-list.php';
     }
 
-    // Xóa user (chỉ super admin)
+    // Xóa người dùng (chỉ super admin)
     public function deleteUser()
     {
         $this->checkSuperAdminPermission();
         
-        $id = $_GET['id'] ?? 0;
-        if ($this->userModel->deleteUser($id)) {
+        $id = intval($_GET['id'] ?? 0);
+        
+        if ($id <= 0) {
+            $_SESSION['error'] = 'ID người dùng không hợp lệ!';
+            header('Location: index.php?act=user-list');
+            exit;
+        }
+        
+        // Kiểm tra xem có phải super admin không
+        $user = $this->nguoiDungModel->getUserById($id);
+        if ($user && $user['role'] === 'super_admin') {
+            $_SESSION['error'] = 'Không thể xóa tài khoản Super Admin!';
+            header('Location: index.php?act=user-list');
+            exit;
+        }
+        
+        if ($this->nguoiDungModel->deleteUser($id)) {
             $_SESSION['success'] = 'Xóa tài khoản thành công!';
         } else {
             $_SESSION['error'] = 'Không thể xóa tài khoản này!';
@@ -281,13 +327,28 @@ class AuthController
         exit;
     }
 
-    // Thay đổi trạng thái user
+    // Thay đổi trạng thái người dùng
     public function toggleUserStatus()
     {
         $this->checkSuperAdminPermission();
         
-        $id = $_GET['id'] ?? 0;
-        if ($this->userModel->toggleUserStatus($id)) {
+        $id = intval($_GET['id'] ?? 0);
+        
+        if ($id <= 0) {
+            $_SESSION['error'] = 'ID người dùng không hợp lệ!';
+            header('Location: index.php?act=user-list');
+            exit;
+        }
+        
+        // Kiểm tra xem có phải super admin không
+        $user = $this->nguoiDungModel->getUserById($id);
+        if ($user && $user['role'] === 'super_admin') {
+            $_SESSION['error'] = 'Không thể thay đổi trạng thái Super Admin!';
+            header('Location: index.php?act=user-list');
+            exit;
+        }
+        
+        if ($this->nguoiDungModel->toggleUserStatus($id)) {
             $_SESSION['success'] = 'Cập nhật trạng thái thành công!';
         } else {
             $_SESSION['error'] = 'Không thể cập nhật trạng thái!';
