@@ -1,4 +1,4 @@
-<?php require_once './views/admin/layout/header.php'; ?>
+<?php require_once './views/quantri/layout/header.php'; ?>
 
 <div class="container-fluid">
     <div class="row">
@@ -390,4 +390,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php require_once './views/admin/layout/footer.php'; ?>
+<?php require_once './views/quantri/layout/footer.php'; ?>

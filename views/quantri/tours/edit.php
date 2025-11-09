@@ -1,4 +1,4 @@
-<?php require_once './views/admin/layout/header.php'; ?>
+<?php require_once './views/quantri/layout/header.php'; ?>
 
 <div class="page-header">
     <h1 class="page-title">Chỉnh sửa Tour</h1>
@@ -61,5 +61,5 @@
     </form>
 </div>
 
-<?php require_once './views/admin/layout/footer.php'; ?>
+<?php require_once './views/quantri/layout/footer.php'; ?>
 

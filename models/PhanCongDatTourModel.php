@@ -147,7 +147,7 @@ class PhanCongDatTourModel
             $sql = "SELECT ba.*, 
                            b.booking_code, b.booking_date, b.total_amount, b.status as booking_status,
                            c.name as customer_name, c.phone as customer_phone, c.email as customer_email,
-                           u.name as assigned_by_name,
+                           u.full_name as assigned_by_name,
                            CASE 
                                WHEN ba.deadline < NOW() AND ba.status = 'pending' THEN 'expired'
                                ELSE ba.status 
@@ -183,8 +183,8 @@ class PhanCongDatTourModel
             $sql = "SELECT ba.*, 
                            b.booking_code, b.booking_date, b.total_amount, b.status as booking_status,
                            c.name as customer_name, c.phone as customer_phone,
-                           g.name as guide_name, g.phone as guide_phone,
-                           u.name as assigned_by_name
+                           g.full_name as guide_name, g.phone as guide_phone,
+                           u.full_name as assigned_by_name
                     FROM booking_assignments ba
                     JOIN bookings b ON ba.booking_id = b.id
                     JOIN customers c ON b.customer_id = c.id
@@ -226,7 +226,7 @@ class PhanCongDatTourModel
     // Lấy thông tin assignment
     private function getAssignmentInfo($assignment_id)
     {
-        $sql = 'SELECT ba.*, b.booking_code, g.name as guide_name 
+        $sql = 'SELECT ba.*, b.booking_code, g.full_name as guide_name 
                 FROM booking_assignments ba
                 JOIN bookings b ON ba.booking_id = b.id
                 JOIN users g ON ba.guide_id = g.id
@@ -276,8 +276,8 @@ class PhanCongDatTourModel
             $sql = "SELECT ba.*, 
                            b.booking_code, b.booking_date, b.total_amount, b.status as booking_status,
                            c.name as customer_name, c.phone as customer_phone, c.email as customer_email,
-                           g.name as guide_name, g.phone as guide_phone, g.email as guide_email,
-                           u.name as assigned_by_name
+                           g.full_name as guide_name, g.phone as guide_phone, g.email as guide_email,
+                           u.full_name as assigned_by_name
                     FROM booking_assignments ba
                     JOIN bookings b ON ba.booking_id = b.id
                     JOIN customers c ON b.customer_id = c.id

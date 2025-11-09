@@ -1,4 +1,4 @@
-<?php require_once './views/admin/layout/header.php'; ?>
+<?php require_once './views/quantri/layout/header.php'; ?>
 
 <div class="dashboard">
     <h1 class="page-title">Dashboard Hướng dẫn viên</h1>
@@ -125,4 +125,4 @@
 }
 </style>
 
-<?php require_once './views/admin/layout/footer.php'; ?>
+<?php require_once './views/quantri/layout/footer.php'; ?>
