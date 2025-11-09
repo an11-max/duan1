@@ -576,18 +576,22 @@ textarea.form-control {
 
 
 /* Role-based Avatar Colors */
+
 .user-avatar .fa-crown {
-    color: #ffd700; /* Gold for Super Admin */
+    color: #ffd700;
+    /* Gold for Super Admin */
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 .user-avatar .fa-user-shield {
-    color: #4dabf7; /* Blue for Admin */
+    color: #4dabf7;
+    /* Blue for Admin */
     text-shadow: 0 0 8px rgba(77, 171, 247, 0.4);
 }
 
 .user-avatar .fa-user-tie {
-    color: #51cf66; /* Green for Tour Guide */
+    color: #51cf66;
+    /* Green for Tour Guide */
     text-shadow: 0 0 8px rgba(81, 207, 102, 0.4);
 }
 

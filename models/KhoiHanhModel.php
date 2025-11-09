@@ -1,6 +1,6 @@
 <?php
 
-class DepartureModel
+class KhoiHanhModel
 {
     public $conn;
 

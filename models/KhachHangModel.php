@@ -1,6 +1,6 @@
 <?php
 
-class CustomerModel
+class KhachHangModel
 {
     public $conn;
 

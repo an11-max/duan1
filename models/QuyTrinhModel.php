@@ -1,6 +1,6 @@
 <?php
 
-class WorkflowModel
+class QuyTrinhModel
 {
     public $conn;
 

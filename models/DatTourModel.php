@@ -1,6 +1,6 @@
 <?php
 
-class BookingModel
+class DatTourModel
 {
     public $conn;
 
@@ -9,7 +9,7 @@ class BookingModel
         $this->conn = connectDB();
     }
 
-    // Lấy tất cả bookings
+    // Lấy tất cả đặt tour
     public function getAllBookings()
     {
         try {
@@ -21,11 +21,11 @@ class BookingModel
             $stmt->execute();
             return $stmt->fetchAll();
         } catch (Exception $e) {
-            echo "Error: " . $e->getMessage();
+            echo "Lỗi: " . $e->getMessage();
         }
     }
 
-    // Lấy booking theo ID
+    // Lấy đặt tour theo ID
     public function getBookingById($id)
     {
         try {
@@ -37,11 +37,11 @@ class BookingModel
             $stmt->execute([':id' => $id]);
             return $stmt->fetch();
         } catch (Exception $e) {
-            echo "Error: " . $e->getMessage();
+            echo "Lỗi: " . $e->getMessage();
         }
     }
 
-    // Thêm booking mới
+    // Thêm đặt tour mới
     public function insertBooking($customer_id, $booking_code, $booking_date, $total_amount, $deposit_amount, $status)
     {
         try {

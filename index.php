@@ -9,19 +9,19 @@ require_once './commons/env.php'; // Khai báo biến môi trường
 require_once './commons/function.php'; // Hàm hỗ trợ
 
 // Require toàn bộ file Controllers
-require_once './controllers/AdminController.php';
-require_once './controllers/AuthController.php';
-require_once './controllers/TourGuideController.php';
+require_once './controllers/QuanTriController.php';
+require_once './controllers/XacThucController.php';
+require_once './controllers/HuongDanVienController.php';
 
 // Require toàn bộ file Models
 require_once './models/TourModel.php';
-require_once './models/BookingModel.php';
-require_once './models/BookingAssignmentModel.php';
-require_once './models/CustomerModel.php';
-require_once './models/DepartureModel.php';
-require_once './models/TourGuideModel.php';
-require_once './models/UserModel.php';
-require_once './models/WorkflowModel.php';
+require_once './models/DatTourModel.php';
+require_once './models/PhanCongDatTourModel.php';
+require_once './models/KhachHangModel.php';
+require_once './models/KhoiHanhModel.php';
+require_once './models/HuongDanVienModel.php';
+require_once './models/NguoiDungModel.php';
+require_once './models/QuyTrinhModel.php';
 
 // Route
 $act = $_GET['act'] ?? '/';
@@ -29,55 +29,55 @@ $act = $_GET['act'] ?? '/';
 // Để bảo bảo tính chất chỉ gọi 1 hàm Controller để xử lý request thì mình sử dụng match
 
 $result = match ($act) {
-    // Authentication Routes
-    'login' => (new AuthController())->login(),
-    'logout' => (new AuthController())->logout(),
-    'register' => (new AuthController())->register(),
-    'user-list' => (new AuthController())->userList(),
-    'delete-user' => (new AuthController())->deleteUser(),
-    'toggle-user-status' => (new AuthController())->toggleUserStatus(),
+    // Xác thực Routes
+    'login' => (new XacThucController())->login(),
+    'logout' => (new XacThucController())->logout(),
+    'register' => (new XacThucController())->register(),
+    'user-list' => (new XacThucController())->userList(),
+    'delete-user' => (new XacThucController())->deleteUser(),
+    'toggle-user-status' => (new XacThucController())->toggleUserStatus(),
 
     // Trang chủ - chuyển thẳng vào admin dashboard
-    '/' => (new AdminController())->dashboard(),
+    '/' => (new QuanTriController())->dashboard(),
 
-    // Admin Routes
-    'admin-dashboard' => (new AdminController())->dashboard(),
+    // Quản trị Routes
+    'admin-dashboard' => (new QuanTriController())->dashboard(),
 
     // Tours
-    'admin-tours' => (new AdminController())->listTours(),
-    'admin-tour-add' => (new AdminController())->addTour(),
-    'admin-tour-edit' => (new AdminController())->editTour(),
-    'admin-tour-delete' => (new AdminController())->deleteTour(),
+    'admin-tours' => (new QuanTriController())->listTours(),
+    'admin-tour-add' => (new QuanTriController())->addTour(),
+    'admin-tour-edit' => (new QuanTriController())->editTour(),
+    'admin-tour-delete' => (new QuanTriController())->deleteTour(),
 
-    // Bookings
-    'admin-bookings' => (new AdminController())->listBookings(),
-    'admin-booking-add' => (new AdminController())->addBooking(),
-    'admin-booking-edit' => (new AdminController())->editBooking(),
-    'admin-booking-delete' => (new AdminController())->deleteBooking(),
+    // Đặt tour
+    'admin-bookings' => (new QuanTriController())->listBookings(),
+    'admin-booking-add' => (new QuanTriController())->addBooking(),
+    'admin-booking-edit' => (new QuanTriController())->editBooking(),
+    'admin-booking-delete' => (new QuanTriController())->deleteBooking(),
 
-    // Customers
-    'admin-customers' => (new AdminController())->listCustomers(),
-    'admin-customer-add' => (new AdminController())->addCustomer(),
-    'admin-customer-edit' => (new AdminController())->editCustomer(),
-    'admin-customer-delete' => (new AdminController())->deleteCustomer(),
+    // Khách hàng
+    'admin-customers' => (new QuanTriController())->listCustomers(),
+    'admin-customer-add' => (new QuanTriController())->addCustomer(),
+    'admin-customer-edit' => (new QuanTriController())->editCustomer(),
+    'admin-customer-delete' => (new QuanTriController())->deleteCustomer(),
 
-    // Departures
-    'admin-departures' => (new AdminController())->listDepartures(),
+    // Khởi hành
+    'admin-departures' => (new QuanTriController())->listDepartures(),
 
-    // Tour Guides
-    'admin-tour-guides' => (new AdminController())->listTourGuides(),
+    // Hướng dẫn viên
+    'admin-tour-guides' => (new QuanTriController())->listTourGuides(),
 
-    // Tour Guide Routes (HDV)
-    'guide-tours' => (new TourGuideController())->viewToursAndSchedule(),
-    'guide-tour-detail' => (new TourGuideController())->viewTourDetail(),
-    'guide-request-form' => (new TourGuideController())->showRequestForm(),
-    'guide-request-tour' => (new TourGuideController())->requestTour(),
-    'guide-notifications' => (new TourGuideController())->viewNotifications(),
-    'guide-requests' => (new TourGuideController())->viewRequests(),
-    'guide-respond-assignment' => (new TourGuideController())->respondToAssignment(),
-    'guide-schedule' => (new TourGuideController())->viewSchedule(),
-    'guide_schedule' => (new TourGuideController())->viewSchedule(),
-    'guide_assignments' => (new TourGuideController())->viewAssignments(),
+    // Hướng dẫn viên Routes (HDV)
+    'guide-tours' => (new HuongDanVienController())->viewToursAndSchedule(),
+    'guide-tour-detail' => (new HuongDanVienController())->viewTourDetail(),
+    'guide-request-form' => (new HuongDanVienController())->showRequestForm(),
+    'guide-request-tour' => (new HuongDanVienController())->requestTour(),
+    'guide-notifications' => (new HuongDanVienController())->viewNotifications(),
+    'guide-requests' => (new HuongDanVienController())->viewRequests(),
+    'guide-respond-assignment' => (new HuongDanVienController())->respondToAssignment(),
+    'guide-schedule' => (new HuongDanVienController())->viewSchedule(),
+    'guide_schedule' => (new HuongDanVienController())->viewSchedule(),
+    'guide_assignments' => (new HuongDanVienController())->viewAssignments(),
     'guide-reviews' => (new TourGuideController())->viewReviews(),
     'guide-profile' => (new TourGuideController())->viewProfile(),
     

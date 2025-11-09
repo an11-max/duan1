@@ -1,13 +1,13 @@
 <?php
 
-class AdminController
+class QuanTriController
 {
     public $tourModel;
-    public $bookingModel;
-    public $customerModel;
-    public $departureModel;
-    public $tourGuideModel;
-    public $bookingAssignmentModel;
+    public $datTourModel;
+    public $khachHangModel;
+    public $khoiHanhModel;
+    public $huongDanVienModel;
+    public $phanCongDatTourModel;
 
     public function __construct()
     {

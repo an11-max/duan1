@@ -1,6 +1,6 @@
 <?php
 
-class BookingAssignmentModel
+class PhanCongDatTourModel
 {
     public $conn;
 
