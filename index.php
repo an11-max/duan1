@@ -78,40 +78,40 @@ $result = match ($act) {
     'guide-schedule' => (new HuongDanVienController())->viewSchedule(),
     'guide_schedule' => (new HuongDanVienController())->viewSchedule(),
     'guide_assignments' => (new HuongDanVienController())->viewAssignments(),
-    'guide-reviews' => (new TourGuideController())->viewReviews(),
-    'guide-profile' => (new TourGuideController())->viewProfile(),
+    'guide-reviews' => (new HuongDanVienController())->viewReviews(),
+    'guide-profile' => (new HuongDanVienController())->viewProfile(),
     
     // Booking Assignment Routes for Tour Guides
-    'guide-booking-assignments' => (new TourGuideController())->bookingAssignments(),
-    'guide-booking-assignment-detail' => (new TourGuideController())->viewBookingAssignment(),
-    'guide-respond-booking-assignment' => (new TourGuideController())->respondToBookingAssignment(),
-    'guide-mark-booking-assignment-read' => (new TourGuideController())->markBookingAssignmentAsRead(),
+    'guide-booking-assignments' => (new HuongDanVienController())->bookingAssignments(),
+    'guide-booking-assignment-detail' => (new HuongDanVienController())->viewBookingAssignment(),
+    'guide-respond-booking-assignment' => (new HuongDanVienController())->respondToBookingAssignment(),
+    'guide-mark-booking-assignment-read' => (new HuongDanVienController())->markBookingAssignmentAsRead(),
     
     // Tour Guide API Routes
-    'guide-notification-count' => (new TourGuideController())->getNotificationCount(),
-    'guide-mark-notification-read' => (new TourGuideController())->markNotificationRead(),
-    'guide-mark-notifications-read' => (new TourGuideController())->markNotificationsRead(),
-    'guide-delete-notification' => (new TourGuideController())->deleteNotification(),
-    'guide-delete-notifications' => (new TourGuideController())->deleteNotifications(),
-    'guide-cancel-request' => (new TourGuideController())->cancelRequest(),
-    'guide-get-booking-assignments' => (new TourGuideController())->getBookingAssignments(),
-    'guide-get-booking-assignment-stats' => (new TourGuideController())->getBookingAssignmentStats(),
+    'guide-notification-count' => (new HuongDanVienController())->getNotificationCount(),
+    'guide-mark-notification-read' => (new HuongDanVienController())->markNotificationRead(),
+    'guide-mark-notifications-read' => (new HuongDanVienController())->markNotificationsRead(),
+    'guide-delete-notification' => (new HuongDanVienController())->deleteNotification(),
+    'guide-delete-notifications' => (new HuongDanVienController())->deleteNotifications(),
+    'guide-cancel-request' => (new HuongDanVienController())->cancelRequest(),
+    'guide-get-booking-assignments' => (new HuongDanVienController())->getBookingAssignments(),
+    'guide-get-booking-assignment-stats' => (new HuongDanVienController())->getBookingAssignmentStats(),
 
     // Admin Workflow Routes
-    'admin-workflow' => (new AdminController())->workflowManagement(),
-    'admin-approve-request' => (new AdminController())->approveRequest(),
-    'admin-reject-request' => (new AdminController())->rejectRequest(),
-    'admin-assign-tour' => (new AdminController())->assignTour(),
+    'admin-workflow' => (new QuanTriController())->workflowManagement(),
+    'admin-approve-request' => (new QuanTriController())->approveRequest(),
+    'admin-reject-request' => (new QuanTriController())->rejectRequest(),
+    'admin-assign-tour' => (new QuanTriController())->assignTour(),
     
     // Booking Assignment Routes for Admin
-    'admin-booking-assignments' => (new AdminController())->bookingAssignments(),
-    'assign-booking-form' => (new AdminController())->assignBookingForm(),
-    'process-booking-assignment' => (new AdminController())->processBookingAssignment(),
-    'admin-booking-assignment-detail' => (new AdminController())->viewBookingAssignment(),
-    'cancel-booking-assignment' => (new AdminController())->cancelBookingAssignment(),
-    'admin-get-booking-assignment-stats' => (new AdminController())->getBookingAssignmentStats(),
+    'admin-booking-assignments' => (new QuanTriController())->bookingAssignments(),
+    'assign-booking-form' => (new QuanTriController())->assignBookingForm(),
+    'process-booking-assignment' => (new QuanTriController())->processBookingAssignment(),
+    'admin-booking-assignment-detail' => (new QuanTriController())->viewBookingAssignment(),
+    'cancel-booking-assignment' => (new QuanTriController())->cancelBookingAssignment(),
+    'admin-get-booking-assignment-stats' => (new QuanTriController())->getBookingAssignmentStats(),
 
-    default => (new AuthController())->showLogin(),
+    default => (new XacThucController())->showLogin(),
 };
 
 // Xử lý kết quả (nếu cần)

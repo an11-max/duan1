@@ -12,14 +12,14 @@ class QuanTriController
     public function __construct()
     {
         // Kiểm tra đăng nhập cho tất cả các action
-        AuthController::checkLogin();
+        XacThucController::checkLogin();
         
         $this->tourModel = new TourModel();
-        $this->bookingModel = new BookingModel();
-        $this->customerModel = new CustomerModel();
-        $this->departureModel = new DepartureModel();
-        $this->tourGuideModel = new TourGuideModel();
-        $this->bookingAssignmentModel = new BookingAssignmentModel();
+        $this->datTourModel = new DatTourModel();
+        $this->khachHangModel = new KhachHangModel();
+        $this->khoiHanhModel = new KhoiHanhModel();
+        $this->huongDanVienModel = new HuongDanVienModel();
+        $this->phanCongDatTourModel = new PhanCongDatTourModel();
     }
 
     // Dashboard - tất cả quyền đều truy cập được
@@ -36,13 +36,13 @@ class QuanTriController
         
         // Admin và Super Admin xem dashboard đầy đủ
         $tourStats = $this->tourModel->getTourStats();
-        $bookingStats = $this->bookingModel->getBookingStats();
-        $departureStats = $this->departureModel->getDepartureStats();
+        $bookingStats = $this->datTourModel->getBookingStats();
+        $departureStats = $this->khoiHanhModel->getDepartureStats();
         
-        $recentBookings = $this->bookingModel->getAllBookings();
-        $upcomingDepartures = $this->departureModel->getDeparturesByStatus('Scheduled');
+        $recentBookings = $this->datTourModel->getAllBookings();
+        $upcomingDepartures = $this->khoiHanhModel->getDeparturesByStatus('Scheduled');
 
-        require_once './views/admin/dashboard.php';
+        require_once './views/quantri/dashboard.php';
     }
 
     // View riêng cho HDV - hiển thị dashboard HDV
@@ -55,7 +55,7 @@ class QuanTriController
         $assigned_tours = $this->tourModel->getToursByGuideId($guide_id);
         
         // Hiển thị dashboard HDV
-        require_once './views/admin/guide_dashboard.php';
+        require_once './views/quantri/guide_dashboard.php';
     }
 
     // Quản lý Tours - chỉ admin và super admin
@@ -63,7 +63,7 @@ class QuanTriController
     {
         // HDV chỉ được xem tours (read-only)
         $tours = $this->tourModel->getAllTours();
-        require_once './views/admin/tours/list.php';
+        require_once './views/quantri/tours/list.php';
     }
 
     public function addTour()
@@ -90,7 +90,7 @@ class QuanTriController
                 exit();
             }
         }
-        require_once './views/admin/tours/add.php';
+        require_once './views/quantri/tours/add.php';
     }
 
     public function editTour()
@@ -126,7 +126,7 @@ class QuanTriController
         }
         
         $tour = $this->tourModel->getTourById($id);
-        require_once './views/admin/tours/edit.php';
+        require_once './views/quantri/tours/edit.php';
     }
 
     public function deleteTour()
@@ -150,8 +150,8 @@ class QuanTriController
     public function listBookings()
     {
         AuthController::checkAdminPermission();
-        $bookings = $this->bookingModel->getAllBookings();
-        require_once './views/admin/bookings/list.php';
+        $bookings = $this->datTourModel->getAllBookings();
+        require_once './views/quantri/bookings/list.php';
     }
 
     public function addBooking()
@@ -165,7 +165,7 @@ class QuanTriController
             $deposit_amount = $_POST['deposit_amount'];
             $status = $_POST['status'];
 
-            $result = $this->bookingModel->insertBooking($customer_id, $booking_code, $booking_date, $total_amount, $deposit_amount, $status);
+            $result = $this->datTourModel->insertBooking($customer_id, $booking_code, $booking_date, $total_amount, $deposit_amount, $status);
             
             if ($result) {
                 header('Location: ' . BASE_URL . '?act=admin-bookings');
@@ -173,8 +173,8 @@ class QuanTriController
             }
         }
         
-        $customers = $this->customerModel->getAllCustomers();
-        require_once './views/admin/bookings/add.php';
+        $customers = $this->khachHangModel->getAllCustomers();
+        require_once './views/quantri/bookings/add.php';
     }
 
     public function editBooking()
@@ -190,7 +190,7 @@ class QuanTriController
             $deposit_amount = $_POST['deposit_amount'];
             $status = $_POST['status'];
 
-            $result = $this->bookingModel->updateBooking($id, $customer_id, $booking_code, $booking_date, $total_amount, $deposit_amount, $status);
+            $result = $this->datTourModel->updateBooking($id, $customer_id, $booking_code, $booking_date, $total_amount, $deposit_amount, $status);
             
             if ($result) {
                 header('Location: ' . BASE_URL . '?act=admin-bookings');
@@ -198,16 +198,16 @@ class QuanTriController
             }
         }
         
-        $booking = $this->bookingModel->getBookingById($id);
-        $customers = $this->customerModel->getAllCustomers();
-        require_once './views/admin/bookings/edit.php';
+        $booking = $this->datTourModel->getBookingById($id);
+        $customers = $this->khachHangModel->getAllCustomers();
+        require_once './views/quantri/bookings/edit.php';
     }
 
     public function deleteBooking()
     {
         AuthController::checkAdminPermission();
         $id = $_GET['id'];
-        $this->bookingModel->deleteBooking($id);
+        $this->datTourModel->deleteBooking($id);
         header('Location: ' . BASE_URL . '?act=admin-bookings');
         exit();
     }
@@ -216,8 +216,8 @@ class QuanTriController
     public function listCustomers()
     {
         AuthController::checkAdminPermission();
-        $customers = $this->customerModel->getAllCustomers();
-        require_once './views/admin/customers/list.php';
+        $customers = $this->khachHangModel->getAllCustomers();
+        require_once './views/quantri/customers/list.php';
     }
 
     public function addCustomer()
@@ -230,14 +230,14 @@ class QuanTriController
             $address = $_POST['address'];
             $history_notes = $_POST['history_notes'] ?? '';
 
-            $result = $this->customerModel->insertCustomer($name, $phone, $email, $address, $history_notes);
+            $result = $this->khachHangModel->insertCustomer($name, $phone, $email, $address, $history_notes);
             
             if ($result) {
                 header('Location: ' . BASE_URL . '?act=admin-customers');
                 exit();
             }
         }
-        require_once './views/admin/customers/add.php';
+        require_once './views/quantri/customers/add.php';
     }
 
     public function editCustomer()
@@ -252,7 +252,7 @@ class QuanTriController
             $address = $_POST['address'];
             $history_notes = $_POST['history_notes'] ?? '';
 
-            $result = $this->customerModel->updateCustomer($id, $name, $phone, $email, $address, $history_notes);
+            $result = $this->khachHangModel->updateCustomer($id, $name, $phone, $email, $address, $history_notes);
             
             if ($result) {
                 header('Location: ' . BASE_URL . '?act=admin-customers');
@@ -260,15 +260,15 @@ class QuanTriController
             }
         }
         
-        $customer = $this->customerModel->getCustomerById($id);
-        require_once './views/admin/customers/edit.php';
+        $customer = $this->khachHangModel->getCustomerById($id);
+        require_once './views/quantri/customers/edit.php';
     }
 
     public function deleteCustomer()
     {
         AuthController::checkAdminPermission();
         $id = $_GET['id'];
-        $this->customerModel->deleteCustomer($id);
+        $this->khachHangModel->deleteCustomer($id);
         header('Location: ' . BASE_URL . '?act=admin-customers');
         exit();
     }
@@ -277,16 +277,16 @@ class QuanTriController
     public function listDepartures()
     {
         AuthController::checkAdminPermission();
-        $departures = $this->departureModel->getAllDepartures();
-        require_once './views/admin/departures/list.php';
+        $departures = $this->khoiHanhModel->getAllDepartures();
+        require_once './views/quantri/departures/list.php';
     }
 
     // Quản lý Tour Guides - chỉ admin và super admin
     public function listTourGuides()
     {
         AuthController::checkAdminPermission();
-        $tourGuides = $this->tourGuideModel->getAllTourGuides();
-        require_once './views/admin/tour_guides/list.php';
+        $tourGuides = $this->huongDanVienModel->getAllTourGuides();
+        require_once './views/quantri/tour_guides/list.php';
     }
 
     // Workflow Management
@@ -320,7 +320,7 @@ class QuanTriController
         // Get available guides for assignment
         $available_guides = $workflowModel->getAvailableGuides();
         
-        require_once './views/admin/workflow_management.php';
+        require_once './views/quantri/workflow_management.php';
     }
     
     public function approveRequest()
@@ -421,10 +421,10 @@ class QuanTriController
         
         // Admin chỉ xem assignments do mình tạo, Super Admin xem tất cả
         $assigned_by = ($role === 'super_admin') ? null : $user_id;
-        $assignments = $this->bookingAssignmentModel->getBookingAssignmentsByAdmin($assigned_by);
-        $stats = $this->bookingAssignmentModel->getBookingAssignmentStats($user_id, $role);
+        $assignments = $this->phanCongDatTourModel->getBookingAssignmentsByAdmin($assigned_by);
+        $stats = $this->phanCongDatTourModel->getBookingAssignmentStats($user_id, $role);
         
-        require_once './views/admin/booking_assignments/list.php';
+        require_once './views/quantri/booking_assignments/list.php';
     }
 
     // Form gửi booking cho HDV
@@ -439,16 +439,16 @@ class QuanTriController
         }
         
         // Lấy thông tin booking
-        $booking = $this->bookingModel->getBookingById($booking_id);
+        $booking = $this->datTourModel->getBookingById($booking_id);
         if (!$booking) {
             header('Location: ?act=admin-bookings');
             exit;
         }
         
         // Lấy danh sách HDV có thể phân công
-        $availableGuides = $this->tourGuideModel->getAvailableGuides();
+        $availableGuides = $this->huongDanVienModel->getAvailableGuides();
         
-        require_once './views/admin/booking_assignments/assign_form.php';
+        require_once './views/quantri/booking_assignments/assign_form.php';
     }
 
     // Xử lý gửi booking cho HDV
@@ -465,7 +465,7 @@ class QuanTriController
             $assigned_by = $_SESSION['user']['id'];
             
             // Kiểm tra xem booking đã được giao cho HDV này chưa
-            $existingAssignments = $this->bookingAssignmentModel->getBookingAssignmentsForGuide($guide_id);
+            $existingAssignments = $this->phanCongDatTourModel->getBookingAssignmentsForGuide($guide_id);
             foreach ($existingAssignments as $assignment) {
                 if ($assignment['booking_id'] == $booking_id && in_array($assignment['status'], ['pending', 'accepted'])) {
                     $_SESSION['error'] = 'Booking này đã được giao cho HDV này rồi!';
@@ -474,7 +474,7 @@ class QuanTriController
                 }
             }
             
-            $result = $this->bookingAssignmentModel->assignBookingToGuide(
+            $result = $this->phanCongDatTourModel->assignBookingToGuide(
                 $booking_id, $guide_id, $assigned_by, $notes, $deadline, $priority
             );
             
@@ -502,7 +502,7 @@ class QuanTriController
             exit;
         }
         
-        $assignment = $this->bookingAssignmentModel->getBookingAssignmentById($assignment_id);
+        $assignment = $this->phanCongDatTourModel->getBookingAssignmentById($assignment_id);
         if (!$assignment) {
             header('Location: ?act=admin-booking-assignments');
             exit;
@@ -514,7 +514,7 @@ class QuanTriController
             exit;
         }
         
-        require_once './views/admin/booking_assignments/view.php';
+        require_once './views/quantri/booking_assignments/view.php';
     }
 
     // Hủy booking assignment
@@ -527,13 +527,13 @@ class QuanTriController
             $cancelled_by = $_SESSION['user']['id'];
             
             // Kiểm tra quyền hủy
-            $assignment = $this->bookingAssignmentModel->getBookingAssignmentById($assignment_id);
+            $assignment = $this->phanCongDatTourModel->getBookingAssignmentById($assignment_id);
             if (!$assignment || ($_SESSION['user']['role'] !== 'super_admin' && $assignment['assigned_by'] != $_SESSION['user']['id'])) {
                 echo json_encode(['success' => false, 'message' => 'Không có quyền hủy assignment này']);
                 exit;
             }
             
-            $result = $this->bookingAssignmentModel->cancelBookingAssignment($assignment_id, $cancelled_by);
+            $result = $this->phanCongDatTourModel->cancelBookingAssignment($assignment_id, $cancelled_by);
             
             if ($result) {
                 echo json_encode(['success' => true, 'message' => 'Đã hủy booking assignment thành công']);
@@ -554,7 +554,7 @@ class QuanTriController
         $user_id = $_SESSION['user']['id'];
         $role = $_SESSION['user']['role'];
         
-        $stats = $this->bookingAssignmentModel->getBookingAssignmentStats($user_id, $role);
+        $stats = $this->phanCongDatTourModel->getBookingAssignmentStats($user_id, $role);
         
         header('Content-Type: application/json');
         echo json_encode($stats);

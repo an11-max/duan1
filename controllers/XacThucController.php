@@ -357,5 +357,36 @@ class XacThucController
         header('Location: index.php?act=user-list');
         exit;
     }
+
+    // Static method để kiểm tra đăng nhập
+    public static function checkLogin()
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: ' . BASE_URL . '?act=login');
+            exit;
+        }
+    }
+
+    // Static method để kiểm tra quyền admin
+    public static function checkAdminPermission()
+    {
+        self::checkLogin();
+        if (!in_array($_SESSION['user']['role'], ['admin', 'super_admin'])) {
+            $_SESSION['error'] = 'Bạn không có quyền truy cập trang này';
+            header('Location: ' . BASE_URL . '?act=admin-dashboard');
+            exit;
+        }
+    }
+
+    // Static method để kiểm tra quyền super admin
+    public static function checkSuperAdminPermission()
+    {
+        self::checkLogin();
+        if ($_SESSION['user']['role'] !== 'super_admin') {
+            $_SESSION['error'] = 'Bạn không có quyền truy cập trang này';
+            header('Location: ' . BASE_URL . '?act=admin-dashboard');
+            exit;
+        }
+    }
 }
 ?>

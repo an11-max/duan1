@@ -1,16 +1,16 @@
 <?php
 
-class TourGuideController
+class HuongDanVienController
 {
     public $tourModel;
-    public $customerModel;
-    public $bookingModel;
-    public $bookingAssignmentModel;
+    public $khachHangModel;
+    public $datTourModel;
+    public $phanCongDatTourModel;
 
     public function __construct()
     {
         // Kiểm tra đăng nhập và quyền HDV
-        AuthController::checkLogin();
+        XacThucController::checkLogin();
         if ($_SESSION['user']['role'] !== 'tour_guide') {
             $_SESSION['error'] = 'Bạn không có quyền truy cập trang này';
             header('Location: ' . BASE_URL . '?act=admin-dashboard');
@@ -18,9 +18,9 @@ class TourGuideController
         }
 
         $this->tourModel = new TourModel();
-        $this->customerModel = new CustomerModel();
-        $this->bookingModel = new BookingModel();
-        $this->bookingAssignmentModel = new BookingAssignmentModel();
+        $this->khachHangModel = new KhachHangModel();
+        $this->datTourModel = new DatTourModel();
+        $this->phanCongDatTourModel = new PhanCongDatTourModel();
     }
 
     // Dashboard cho HDV
@@ -43,7 +43,7 @@ class TourGuideController
         // Đếm tổng số thông báo
         $notificationCount = count($notifications);
 
-        require_once './views/admin/guide_dashboard.php';
+        require_once './views/quantri/guide_dashboard.php';
     }
 
     // Xem danh sách tours được phân công và lịch trình
@@ -54,7 +54,7 @@ class TourGuideController
         // Lấy tất cả tours được phân công với thông tin chi tiết
         $assignedTours = $this->getDetailedAssignments($guideId);
         
-        require_once './views/admin/guide_tours_schedule.php';
+        require_once './views/quantri/guide_tours_schedule.php';
     }
 
     // Trang lịch trình - chỉ tour đã chấp nhận
@@ -62,7 +62,7 @@ class TourGuideController
     {
         $guideId = $_SESSION['user']['id'];
         $assignedTours = $this->getDetailedAssignments($guideId);
-        require_once './views/admin/guide_schedule.php';
+        require_once './views/quantri/guide_schedule.php';
     }
 
     // Trang tour được phân công - chỉ tour chờ xác nhận
@@ -70,7 +70,7 @@ class TourGuideController
     {
         $guideId = $_SESSION['user']['id'];
         $assignedTours = $this->getDetailedAssignments($guideId);
-        require_once './views/admin/guide_assignments.php';
+        require_once './views/quantri/guide_assignments.php';
     }
 
     // Xem chi tiết tour và khách hàng
@@ -90,7 +90,7 @@ class TourGuideController
         $customers = $this->getTourCustomers($tourId);
         $bookings = $this->getTourBookings($tourId);
         
-        require_once './views/admin/guide_tour_detail.php';
+        require_once './views/quantri/guide_tour_detail.php';
     }
 
     // Hiển thị form yêu cầu tour
@@ -120,7 +120,7 @@ class TourGuideController
             }
         }
         
-        require_once './views/admin/guide_request_form.php';
+        require_once './views/quantri/guide_request_form.php';
     }
 
     // Gửi yêu cầu nhận tour
@@ -159,7 +159,7 @@ class TourGuideController
         // Đánh dấu đã đọc
         $this->markNotificationsAsRead($guideId);
         
-        require_once './views/admin/guide_notifications.php';
+        require_once './views/quantri/guide_notifications.php';
     }
 
     // Xem yêu cầu đã gửi
@@ -167,7 +167,7 @@ class TourGuideController
     {
         $guideId = $_SESSION['user']['id'];
         $requests = $this->getGuideRequests($guideId);
-        require_once './views/admin/guide_requests.php';
+        require_once './views/quantri/guide_requests.php';
     }
 
     // Chấp nhận/từ chối tour được phân công
@@ -848,7 +848,7 @@ class TourGuideController
         // Tạm thời để trống - có thể mở rộng sau
         $reviews = [];
         
-        require_once './views/admin/guide_reviews.php';
+        require_once './views/quantri/guide_reviews.php';
     }
 
     // Xem thông tin cá nhân
@@ -859,7 +859,7 @@ class TourGuideController
         // Lấy thông tin user từ session
         $userInfo = $_SESSION['user'];
         
-        require_once './views/admin/guide_profile.php';
+        require_once './views/quantri/guide_profile.php';
     }
 
     private function notifyAdminAssignmentResponse($assignmentId, $action)
@@ -910,7 +910,7 @@ class TourGuideController
         $guide_id = $_SESSION['user']['id'];
         
         // Lấy tất cả booking assignments
-        $allAssignments = $this->bookingAssignmentModel->getBookingAssignmentsForGuide($guide_id);
+        $allAssignments = $this->phanCongDatTourModel->getBookingAssignmentsForGuide($guide_id);
         
         // Phân loại theo status
         $pendingAssignments = array_filter($allAssignments, function($assignment) {
@@ -926,9 +926,9 @@ class TourGuideController
         });
         
         // Thống kê
-        $stats = $this->bookingAssignmentModel->getBookingAssignmentStats($guide_id, 'tour_guide');
+        $stats = $this->phanCongDatTourModel->getBookingAssignmentStats($guide_id, 'tour_guide');
         
-        require_once './views/guide/booking_assignments.php';
+        require_once './views/huongdanvien/booking_assignments.php';
     }
 
     // Xem chi tiết booking assignment
@@ -942,7 +942,7 @@ class TourGuideController
             exit;
         }
         
-        $assignment = $this->bookingAssignmentModel->getBookingAssignmentById($assignment_id);
+        $assignment = $this->phanCongDatTourModel->getBookingAssignmentById($assignment_id);
         
         // Kiểm tra quyền xem (chỉ HDV được phân công)
         if (!$assignment || $assignment['guide_id'] != $guide_id) {
@@ -950,7 +950,7 @@ class TourGuideController
             exit;
         }
         
-        require_once './views/guide/booking_assignment_detail.php';
+        require_once './views/huongdanvien/booking_assignment_detail.php';
     }
 
     // Phản hồi booking assignment
@@ -969,7 +969,7 @@ class TourGuideController
             }
             
             // Kiểm tra quyền phản hồi
-            $assignment = $this->bookingAssignmentModel->getBookingAssignmentById($assignment_id);
+            $assignment = $this->phanCongDatTourModel->getBookingAssignmentById($assignment_id);
             if (!$assignment || $assignment['guide_id'] != $guide_id) {
                 echo json_encode(['success' => false, 'message' => 'Không có quyền phản hồi assignment này']);
                 exit;
@@ -981,7 +981,7 @@ class TourGuideController
                 exit;
             }
             
-            $result = $this->bookingAssignmentModel->respondToBookingAssignment($assignment_id, $guide_id, $status, $response);
+            $result = $this->phanCongDatTourModel->respondToBookingAssignment($assignment_id, $guide_id, $status, $response);
             
             if ($result) {
                 $message = $status === 'accepted' ? 'Đã chấp nhận booking assignment' : 'Đã từ chối booking assignment';
@@ -1001,7 +1001,7 @@ class TourGuideController
         $guide_id = $_SESSION['user']['id'];
         $status = $_GET['status'] ?? null;
         
-        $assignments = $this->bookingAssignmentModel->getBookingAssignmentsForGuide($guide_id, $status);
+        $assignments = $this->phanCongDatTourModel->getBookingAssignmentsForGuide($guide_id, $status);
         
         header('Content-Type: application/json');
         echo json_encode($assignments);
@@ -1013,7 +1013,7 @@ class TourGuideController
     {
         $guide_id = $_SESSION['user']['id'];
         
-        $stats = $this->bookingAssignmentModel->getBookingAssignmentStats($guide_id, 'tour_guide');
+        $stats = $this->phanCongDatTourModel->getBookingAssignmentStats($guide_id, 'tour_guide');
         
         header('Content-Type: application/json');
         echo json_encode($stats);
@@ -1028,7 +1028,7 @@ class TourGuideController
             $guide_id = $_SESSION['user']['id'];
             
             // Kiểm tra quyền
-            $assignment = $this->bookingAssignmentModel->getBookingAssignmentById($assignment_id);
+            $assignment = $this->phanCongDatTourModel->getBookingAssignmentById($assignment_id);
             if (!$assignment || $assignment['guide_id'] != $guide_id) {
                 echo json_encode(['success' => false, 'message' => 'Không có quyền']);
                 exit;
