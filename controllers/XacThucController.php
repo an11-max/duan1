@@ -100,14 +100,14 @@ class XacThucController
     // Hiển thị form đăng ký (chỉ super admin)
     public function showRegister()
     {
-        $this->checkSuperAdminPermission();
+        self::checkSuperAdminPermission();
         require_once './views/auth/register.php';
     }
 
     // Xử lý đăng ký (chỉ super admin)
     public function register()
     {
-        $this->checkSuperAdminPermission();
+        self::checkSuperAdminPermission();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
@@ -250,7 +250,7 @@ class XacThucController
     }
 
     // Kiểm tra quyền super admin
-    public static function checkSuperAdminPermissionStatic()
+    public static function checkSuperAdminPermission()
     {
         self::checkLogin();
         if ($_SESSION['user']['role'] !== 'super_admin') {
@@ -263,7 +263,7 @@ class XacThucController
     // Danh sách người dùng với tính năng nâng cao (chỉ super admin)
     public function userList()
     {
-        $this->checkSuperAdminPermission();
+        self::checkSuperAdminPermission();
         
         // Lấy tham số tìm kiếm và lọc
         $page = max(1, intval($_GET['page'] ?? 1));
@@ -299,7 +299,7 @@ class XacThucController
     // Xóa người dùng (chỉ super admin)
     public function deleteUser()
     {
-        $this->checkSuperAdminPermission();
+        self::checkSuperAdminPermission();
         
         $id = intval($_GET['id'] ?? 0);
         
@@ -330,7 +330,7 @@ class XacThucController
     // Thay đổi trạng thái người dùng
     public function toggleUserStatus()
     {
-        $this->checkSuperAdminPermission();
+        self::checkSuperAdminPermission();
         
         $id = intval($_GET['id'] ?? 0);
         
@@ -356,37 +356,6 @@ class XacThucController
         
         header('Location: index.php?act=user-list');
         exit;
-    }
-
-    // Static method để kiểm tra đăng nhập
-    public static function checkLogin()
-    {
-        if (!isset($_SESSION['user'])) {
-            header('Location: ' . BASE_URL . '?act=login');
-            exit;
-        }
-    }
-
-    // Static method để kiểm tra quyền admin
-    public static function checkAdminPermission()
-    {
-        self::checkLogin();
-        if (!in_array($_SESSION['user']['role'], ['admin', 'super_admin'])) {
-            $_SESSION['error'] = 'Bạn không có quyền truy cập trang này';
-            header('Location: ' . BASE_URL . '?act=admin-dashboard');
-            exit;
-        }
-    }
-
-    // Static method để kiểm tra quyền super admin
-    public static function checkSuperAdminPermission()
-    {
-        self::checkLogin();
-        if ($_SESSION['user']['role'] !== 'super_admin') {
-            $_SESSION['error'] = 'Bạn không có quyền truy cập trang này';
-            header('Location: ' . BASE_URL . '?act=admin-dashboard');
-            exit;
-        }
     }
 }
 ?>
