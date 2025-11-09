@@ -20,8 +20,21 @@
             <!-- User Profile Section -->
             <div class="user-profile">
                 <div class="user-avatar">
-                    <img src="<?= BASE_URL ?>uploads/avatars/<?= $_SESSION['user']['avatar'] ?? 'default-avatar.png' ?>" 
-                         alt="Avatar" onerror="this.src='<?= BASE_URL ?>assets/images/default-avatar.png'">
+                    <i class="<?php
+                        switch ($_SESSION['user']['role']) {
+                            case 'super_admin':
+                                echo 'fas fa-crown';
+                                break;
+                            case 'admin':
+                                echo 'fas fa-user-shield';
+                                break;
+                            case 'tour_guide':
+                                echo 'fas fa-user-tie';
+                                break;
+                            default:
+                                echo 'fas fa-user';
+                        }
+                    ?>"></i>
                 </div>
                 <div class="user-details">
                     <div class="user-name"><?= htmlspecialchars($_SESSION['user']['full_name']) ?></div>
@@ -153,9 +166,21 @@
                 </div>
                 <div class="header-right">
                     <div class="user-info">
-                        <img src="<?= BASE_URL ?>uploads/avatars/<?= $_SESSION['user']['avatar'] ?? 'default-avatar.png' ?>" 
-                             alt="Avatar" class="header-avatar" 
-                             onerror="this.src='<?= BASE_URL ?>assets/images/default-avatar.png'">
+                        <i class="<?php
+                            switch ($_SESSION['user']['role']) {
+                                case 'super_admin':
+                                    echo 'fas fa-crown';
+                                    break;
+                                case 'admin':
+                                    echo 'fas fa-user-shield';
+                                    break;
+                                case 'tour_guide':
+                                    echo 'fas fa-user-tie';
+                                    break;
+                                default:
+                                    echo 'fas fa-user';
+                            }
+                        ?> header-avatar"></i>
                         <div class="user-text">
                             <span class="user-name"><?= htmlspecialchars($_SESSION['user']['full_name']) ?></span>
                             <small class="user-role-small">

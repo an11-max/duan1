@@ -59,12 +59,17 @@ body {
     gap: 15px;
 }
 
-.user-avatar img {
+.user-avatar {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    object-fit: cover;
     border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .user-details {
@@ -175,8 +180,13 @@ body {
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    object-fit: cover;
     border: 2px solid #667eea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 16px;
 }
 
 .user-text {
@@ -562,6 +572,41 @@ textarea.form-control {
     border-top: 1px solid #e9ecef;
     color: #7f8c8d;
     font-size: 14px;
+}
+
+
+/* Role-based Avatar Colors */
+.user-avatar .fa-crown {
+    color: #ffd700; /* Gold for Super Admin */
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.user-avatar .fa-user-shield {
+    color: #4dabf7; /* Blue for Admin */
+    text-shadow: 0 0 8px rgba(77, 171, 247, 0.4);
+}
+
+.user-avatar .fa-user-tie {
+    color: #51cf66; /* Green for Tour Guide */
+    text-shadow: 0 0 8px rgba(81, 207, 102, 0.4);
+}
+
+.header-avatar.fa-crown {
+    background: linear-gradient(135deg, #ffd700, #ffed4a);
+    color: #8b5a00;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.header-avatar.fa-user-shield {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+.header-avatar.fa-user-tie {
+    background: linear-gradient(135deg, #51cf66, #40c057);
+    color: white;
+    box-shadow: 0 0 10px rgba(81, 207, 102, 0.3);
 }
 
 
