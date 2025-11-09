@@ -326,7 +326,7 @@ class PhanCongDatTourModel
             $canceller = $this->getUserInfo($cancelled_by);
             
             $title = 'Booking assignment đã bị hủy';
-            $message = "Booking assignment {$assignment['booking_code']} đã bị hủy bởi {$canceller['name']}";
+            $message = "Booking assignment {$assignment['booking_code']} đã bị hủy bởi {$canceller['full_name']}";
             
             // Thông báo cho HDV
             $sql = 'INSERT INTO notifications (user_id, title, message, type, related_type, related_id, booking_id, priority) 

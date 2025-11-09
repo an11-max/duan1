@@ -16,7 +16,7 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4">
+    <div class="row mb-4 stats-cards-row">
         <div class="col-xl-3 col-md-6">
             <div class="card bg-primary text-white">
                 <div class="card-body">
@@ -108,46 +108,51 @@
                     <?php endif; ?>
 
                     <!-- Filters -->
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            <select class="form-select" id="statusFilter">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="pending">Chờ phản hồi</option>
-                                <option value="accepted">Đã chấp nhận</option>
-                                <option value="declined">Đã từ chối</option>
-                                <option value="cancelled">Đã hủy</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="priorityFilter">
-                                <option value="">Tất cả mức độ</option>
-                                <option value="urgent">Khẩn cấp</option>
-                                <option value="high">Cao</option>
-                                <option value="medium">Trung bình</option>
-                                <option value="low">Thấp</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm theo booking code, tên khách hàng, HDV...">
-                                <button class="btn btn-outline-secondary" type="button" id="searchBtn">
-                                    <i class="fas fa-search"></i>
-                                </button>
+                    <div class="filter-section">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Trạng thái</label>
+                                <select class="form-select" id="statusFilter">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="pending">Chờ phản hồi</option>
+                                    <option value="accepted">Đã chấp nhận</option>
+                                    <option value="declined">Đã từ chối</option>
+                                    <option value="cancelled">Đã hủy</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Mức độ ưu tiên</label>
+                                <select class="form-select" id="priorityFilter">
+                                    <option value="">Tất cả mức độ</option>
+                                    <option value="urgent">Khẩn cấp</option>
+                                    <option value="high">Cao</option>
+                                    <option value="medium">Trung bình</option>
+                                    <option value="low">Thấp</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Tìm kiếm</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Booking code, tên khách hàng, HDV...">
+                                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="assignmentsTable">
-                            <thead class="table-light">
+                    <div class="assignment-table-container">
+                        <table class="table assignment-table" id="assignmentsTable">
+                            <thead>
                                 <tr>
-                                    <th>Booking Code</th>
-                                    <th>Khách hàng</th>
-                                    <th>HDV</th>
-                                    <th>Người giao</th>
-                                    <th>Ngày giao</th>
-                                    <th>Deadline</th>
-                                    <th>Mức độ</th>
+                                    <th><i class="fas fa-barcode me-2"></i>Booking Code</th>
+                                    <th><i class="fas fa-user me-2"></i>Khách hàng</th>
+                                    <th><i class="fas fa-user-tie me-2"></i>HDV</th>
+                                    <th><i class="fas fa-user-cog me-2"></i>Người giao</th>
+                                    <th><i class="fas fa-calendar me-2"></i>Ngày giao</th>
+                                    <th><i class="fas fa-clock me-2"></i>Deadline</th>
+                                    <th><i class="fas fa-flag me-2"></i>Mức độ</th>
                                     <th>Trạng thái</th>
                                     <th>Thao tác</th>
                                 </tr>
@@ -175,39 +180,51 @@
                                                 </small>
                                             </td>
                                             <td>
-                                                <div>
+                                                <div class="customer-info-card">
                                                     <strong><?= htmlspecialchars($assignment['customer_name']) ?></strong>
                                                     <br>
-                                                    <small class="text-muted"><?= htmlspecialchars($assignment['customer_phone']) ?></small>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-phone me-1"></i><?= htmlspecialchars($assignment['customer_phone']) ?>
+                                                    </small>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div>
+                                                <div class="guide-info-card">
                                                     <strong><?= htmlspecialchars($assignment['guide_name']) ?></strong>
                                                     <br>
-                                                    <small class="text-muted"><?= htmlspecialchars($assignment['guide_phone']) ?></small>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-phone me-1"></i><?= htmlspecialchars($assignment['guide_phone']) ?>
+                                                    </small>
                                                 </div>
                                             </td>
-                                            <td><?= htmlspecialchars($assignment['assigned_by_name']) ?></td>
                                             <td>
+                                                <i class="fas fa-user-shield me-1"></i>
+                                                <?= htmlspecialchars($assignment['assigned_by_name']) ?>
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-calendar-plus me-1"></i>
                                                 <small><?= date('d/m/Y H:i', strtotime($assignment['assigned_date'])) ?></small>
                                             </td>
                                             <td>
                                                 <?php if ($assignment['deadline']): ?>
-                                                    <small class="<?= strtotime($assignment['deadline']) < time() ? 'text-danger' : 'text-warning' ?>">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    <small class="<?= strtotime($assignment['deadline']) < time() ? 'text-danger fw-bold' : 'text-warning' ?>">
                                                         <?= date('d/m/Y H:i', strtotime($assignment['deadline'])) ?>
+                                                        <?php if (strtotime($assignment['deadline']) < time()): ?>
+                                                            <br><span class="badge bg-danger">Quá hạn</span>
+                                                        <?php endif; ?>
                                                     </small>
                                                 <?php else: ?>
-                                                    <small class="text-muted">Không giới hạn</small>
+                                                    <span class="badge bg-secondary">Không giới hạn</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td>
                                                 <?php
                                                 $priority_classes = [
-                                                    'urgent' => 'danger',
-                                                    'high' => 'warning',
-                                                    'medium' => 'info',
-                                                    'low' => 'secondary'
+                                                    'urgent' => 'priority-high',
+                                                    'high' => 'priority-high', 
+                                                    'medium' => 'priority-medium',
+                                                    'low' => 'priority-low'
                                                 ];
                                                 $priority_labels = [
                                                     'urgent' => 'Khẩn cấp',
@@ -215,8 +232,15 @@
                                                     'medium' => 'Trung bình',
                                                     'low' => 'Thấp'
                                                 ];
+                                                $priority_icons = [
+                                                    'urgent' => 'fas fa-exclamation-triangle',
+                                                    'high' => 'fas fa-arrow-up',
+                                                    'medium' => 'fas fa-minus',
+                                                    'low' => 'fas fa-arrow-down'
+                                                ];
                                                 ?>
-                                                <span class="badge bg-<?= $priority_classes[$assignment['priority']] ?>">
+                                                <span class="priority-indicator <?= $priority_classes[$assignment['priority']] ?>">
+                                                    <i class="<?= $priority_icons[$assignment['priority']] ?>"></i>
                                                     <?= $priority_labels[$assignment['priority']] ?>
                                                 </span>
                                             </td>
@@ -234,21 +258,29 @@
                                                     'declined' => 'Đã từ chối',
                                                     'cancelled' => 'Đã hủy'
                                                 ];
+                                                $status_icons = [
+                                                    'pending' => 'fas fa-clock',
+                                                    'accepted' => 'fas fa-check-circle',
+                                                    'declined' => 'fas fa-times-circle',
+                                                    'cancelled' => 'fas fa-ban'
+                                                ];
                                                 ?>
-                                                <span class="badge bg-<?= $status_classes[$assignment['status']] ?>">
+                                                <span class="status-badge badge-<?= $status_classes[$assignment['status']] ?>">
+                                                    <i class="<?= $status_icons[$assignment['status']] ?>"></i>
                                                     <?= $status_labels[$assignment['status']] ?>
                                                 </span>
                                                 <?php if ($assignment['response_date']): ?>
                                                     <br>
                                                     <small class="text-muted">
+                                                        <i class="fas fa-calendar-check me-1"></i>
                                                         <?= date('d/m/Y H:i', strtotime($assignment['response_date'])) ?>
                                                     </small>
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <div class="btn-group" role="group">
+                                                <div class="action-buttons">
                                                     <a href="?act=admin-booking-assignment-detail&id=<?= $assignment['id'] ?>" 
-                                                       class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                                       class="btn btn-sm btn-outline-info" title="Xem chi tiết">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     <?php if ($assignment['status'] === 'pending'): ?>
@@ -344,6 +376,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('confirmCancelAssignment').addEventListener('click', function() {
         if (assignmentIdToCancel) {
+            // Show loading overlay
+            showLoadingOverlay();
+            
             fetch('?act=cancel-booking-assignment', {
                 method: 'POST',
                 headers: {
@@ -353,21 +388,59 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
+                hideLoadingOverlay();
                 if (data.success) {
-                    location.reload();
+                    // Show success message
+                    showAlert('success', 'Assignment đã được hủy thành công!');
+                    // Reload page after 1 second
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
                 } else {
-                    alert('Lỗi: ' + data.message);
+                    showAlert('error', 'Lỗi: ' + data.message);
                 }
             })
             .catch(error => {
+                hideLoadingOverlay();
                 console.error('Error:', error);
-                alert('Có lỗi xảy ra khi hủy assignment');
+                showAlert('error', 'Có lỗi xảy ra khi hủy assignment');
             });
         }
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('cancelAssignmentModal'));
         modal.hide();
     });
+    
+    // Helper functions
+    function showLoadingOverlay() {
+        const overlay = document.createElement('div');
+        overlay.className = 'loading-overlay';
+        overlay.innerHTML = '<div class="loading-spinner"></div>';
+        overlay.id = 'loadingOverlay';
+        document.body.appendChild(overlay);
+    }
+    
+    function hideLoadingOverlay() {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.remove();
+        }
+    }
+    
+    function showAlert(type, message) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        // Insert at the top of card body
+        const cardBody = document.querySelector('.card-body');
+        cardBody.insertAdjacentHTML('afterbegin', alertHtml);
+    }
 });
 </script>
 
