@@ -183,12 +183,13 @@ class PhanCongDatTourModel
             $sql = "SELECT ba.*, 
                            b.booking_code, b.booking_date, b.total_amount, b.status as booking_status,
                            c.name as customer_name, c.phone as customer_phone,
-                           g.full_name as guide_name, g.phone as guide_phone,
+                           g.full_name as guide_name, tg.phone as guide_phone,
                            u.full_name as assigned_by_name
                     FROM booking_assignments ba
                     JOIN bookings b ON ba.booking_id = b.id
                     JOIN customers c ON b.customer_id = c.id
                     JOIN users g ON ba.guide_id = g.id
+                    LEFT JOIN tour_guides tg ON g.id = tg.user_id
                     JOIN users u ON ba.assigned_by = u.id
                     {$where_clause}
                     ORDER BY ba.assigned_date DESC";
@@ -276,12 +277,13 @@ class PhanCongDatTourModel
             $sql = "SELECT ba.*, 
                            b.booking_code, b.booking_date, b.total_amount, b.status as booking_status,
                            c.name as customer_name, c.phone as customer_phone, c.email as customer_email,
-                           g.full_name as guide_name, g.phone as guide_phone, g.email as guide_email,
+                           g.full_name as guide_name, tg.phone as guide_phone, tg.email as guide_email,
                            u.full_name as assigned_by_name
                     FROM booking_assignments ba
                     JOIN bookings b ON ba.booking_id = b.id
                     JOIN customers c ON b.customer_id = c.id
                     JOIN users g ON ba.guide_id = g.id
+                    LEFT JOIN tour_guides tg ON g.id = tg.user_id
                     JOIN users u ON ba.assigned_by = u.id
                     WHERE ba.id = :assignment_id";
             
