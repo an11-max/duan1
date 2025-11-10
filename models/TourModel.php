@@ -176,4 +176,3 @@ class TourModel
         $this->conn = null;
     }
 }
-

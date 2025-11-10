@@ -1,13 +1,14 @@
 <?php
 
-class QuanTriController
+class AdminController
 {
     public $tourModel;
-    public $datTourModel;
-    public $khachHangModel;
-    public $khoiHanhModel;
-    public $huongDanVienModel;
-    public $phanCongDatTourModel;
+    public $bookingModel;
+    public $customerModel;
+    public $departureModel;
+    public $tourGuideModel;
+    public $bookingAssignmentModel;
+    public $userModel;
 
     public function __construct()
     {
@@ -15,14 +16,15 @@ class QuanTriController
         XacThucController::checkLogin();
         
         $this->tourModel = new TourModel();
-        $this->datTourModel = new DatTourModel();
-        $this->khachHangModel = new KhachHangModel();
-        $this->khoiHanhModel = new KhoiHanhModel();
-        $this->huongDanVienModel = new HuongDanVienModel();
-        $this->phanCongDatTourModel = new PhanCongDatTourModel();
+        $this->bookingModel = new DatTourModel(); // Thay BookingModel bằng DatTourModel
+        $this->customerModel = new KhachHangModel(); // Thay CustomerModel bằng KhachHangModel
+        $this->departureModel = new KhoiHanhModel(); // Thay DepartureModel bằng KhoiHanhModel
+        $this->tourGuideModel = new HuongDanVienModel(); // Thay TourGuideModel bằng HuongDanVienModel
+        $this->bookingAssignmentModel = new PhanCongDatTourModel(); // Thay BookingAssignmentModel bằng PhanCongDatTourModel
+        $this->userModel = new UserModel();
     }
 
-    // Dashboard - tất cả quyền đều truy cập được
+    // Dashboard - admin, super admin và HDV truy cập được
     public function dashboard()
     {
         // Kiểm tra quyền xem dashboard dựa trên role
@@ -35,14 +37,16 @@ class QuanTriController
         }
         
         // Admin và Super Admin xem dashboard đầy đủ
-        $tourStats = $this->tourModel->getTourStats();
-        $bookingStats = $this->datTourModel->getBookingStats();
-        $departureStats = $this->khoiHanhModel->getDepartureStats();
+        XacThucController::checkAdminPermission();
         
-        $recentBookings = $this->datTourModel->getAllBookings();
-        $upcomingDepartures = $this->khoiHanhModel->getDeparturesByStatus('Scheduled');
+        $tourStats = $this->tourModel->getTourStats();
+        $bookingStats = $this->bookingModel->getBookingStats();
+        $departureStats = $this->departureModel->getDepartureStats();
+        
+        $recentBookings = $this->bookingModel->getAllBookings();
+        $upcomingDepartures = $this->departureModel->getDeparturesByStatus('Scheduled');
 
-        require_once './views/quantri/dashboard.php';
+        require_once './views/admin/dashboard.php';
     }
 
     // View riêng cho HDV - hiển thị dashboard HDV
@@ -55,22 +59,21 @@ class QuanTriController
         $assigned_tours = $this->tourModel->getToursByGuideId($guide_id);
         
         // Hiển thị dashboard HDV
-        require_once './views/quantri/guide_dashboard.php';
+        require_once './views/admin/guide_dashboard.php';
     }
 
-    // Quản lý Tours - chỉ super admin
+    // Quản lý Tours - chỉ admin và super admin
     public function listTours()
     {
-        // Chỉ super admin được quản lý tours
-        XacThucController::checkSuperAdminPermission();
+        // HDV chỉ được xem tours (read-only)
         $tours = $this->tourModel->getAllTours();
-        require_once './views/quantri/tours/list.php';
+        require_once './views/admin/tours/list.php';
     }
 
     public function addTour()
     {
-        // Chỉ super admin được thêm tour
-        XacThucController::checkSuperAdminPermission();
+        // Chỉ admin và super admin được thêm tour
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tour_code = $_POST['tour_code'];
@@ -91,13 +94,13 @@ class QuanTriController
                 exit();
             }
         }
-        require_once './views/quantri/tours/add.php';
+        require_once './views/admin/tours/add.php';
     }
 
     public function editTour()
     {
-        // Chỉ super admin được sửa tour
-        XacThucController::checkSuperAdminPermission();
+        // Chỉ admin và super admin được sửa tour
+        XacThucController::checkAdminPermission();
         
         $id = $_GET['id'];
         
@@ -127,13 +130,13 @@ class QuanTriController
         }
         
         $tour = $this->tourModel->getTourById($id);
-        require_once './views/quantri/tours/edit.php';
+        require_once './views/admin/tours/edit.php';
     }
 
     public function deleteTour()
     {
         // Chỉ admin và super admin được xóa tour
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $id = $_GET['id'];
         $tour = $this->tourModel->getTourById($id);
@@ -150,14 +153,14 @@ class QuanTriController
     // Quản lý Bookings - chỉ admin và super admin
     public function listBookings()
     {
-        XacThucController::checkSuperAdminPermission();
-        $bookings = $this->datTourModel->getAllBookings();
-        require_once './views/quantri/bookings/list.php';
+        XacThucController::checkAdminPermission();
+        $bookings = $this->bookingModel->getAllBookings();
+        require_once './views/admin/bookings/list.php';
     }
 
     public function addBooking()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $customer_id = $_POST['customer_id'];
             $booking_code = $_POST['booking_code'];
@@ -166,7 +169,7 @@ class QuanTriController
             $deposit_amount = $_POST['deposit_amount'];
             $status = $_POST['status'];
 
-            $result = $this->datTourModel->insertBooking($customer_id, $booking_code, $booking_date, $total_amount, $deposit_amount, $status);
+            $result = $this->bookingModel->insertBooking($customer_id, $booking_code, $booking_date, $total_amount, $deposit_amount, $status);
             
             if ($result) {
                 header('Location: ' . BASE_URL . '?act=admin-bookings');
@@ -174,13 +177,13 @@ class QuanTriController
             }
         }
         
-        $customers = $this->khachHangModel->getAllCustomers();
-        require_once './views/quantri/bookings/add.php';
+        $customers = $this->customerModel->getAllCustomers();
+        require_once './views/admin/bookings/add.php';
     }
 
     public function editBooking()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         $id = $_GET['id'];
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -191,7 +194,7 @@ class QuanTriController
             $deposit_amount = $_POST['deposit_amount'];
             $status = $_POST['status'];
 
-            $result = $this->datTourModel->updateBooking($id, $customer_id, $booking_code, $booking_date, $total_amount, $deposit_amount, $status);
+            $result = $this->bookingModel->updateBooking($id, $customer_id, $booking_code, $booking_date, $total_amount, $deposit_amount, $status);
             
             if ($result) {
                 header('Location: ' . BASE_URL . '?act=admin-bookings');
@@ -199,16 +202,16 @@ class QuanTriController
             }
         }
         
-        $booking = $this->datTourModel->getBookingById($id);
-        $customers = $this->khachHangModel->getAllCustomers();
-        require_once './views/quantri/bookings/edit.php';
+        $booking = $this->bookingModel->getBookingById($id);
+        $customers = $this->customerModel->getAllCustomers();
+        require_once './views/admin/bookings/edit.php';
     }
 
     public function deleteBooking()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         $id = $_GET['id'];
-        $this->datTourModel->deleteBooking($id);
+        $this->bookingModel->deleteBooking($id);
         header('Location: ' . BASE_URL . '?act=admin-bookings');
         exit();
     }
@@ -216,14 +219,14 @@ class QuanTriController
     // Quản lý Customers - chỉ admin và super admin
     public function listCustomers()
     {
-        XacThucController::checkSuperAdminPermission();
-        $customers = $this->khachHangModel->getAllCustomers();
-        require_once './views/quantri/customers/list.php';
+        XacThucController::checkAdminPermission();
+        $customers = $this->customerModel->getAllCustomers();
+        require_once './views/admin/customers/list.php';
     }
 
     public function addCustomer()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = $_POST['name'];
             $phone = $_POST['phone'];
@@ -231,19 +234,19 @@ class QuanTriController
             $address = $_POST['address'];
             $history_notes = $_POST['history_notes'] ?? '';
 
-            $result = $this->khachHangModel->insertCustomer($name, $phone, $email, $address, $history_notes);
+            $result = $this->customerModel->insertCustomer($name, $phone, $email, $address, $history_notes);
             
             if ($result) {
                 header('Location: ' . BASE_URL . '?act=admin-customers');
                 exit();
             }
         }
-        require_once './views/quantri/customers/add.php';
+        require_once './views/admin/customers/add.php';
     }
 
     public function editCustomer()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         $id = $_GET['id'];
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -253,7 +256,7 @@ class QuanTriController
             $address = $_POST['address'];
             $history_notes = $_POST['history_notes'] ?? '';
 
-            $result = $this->khachHangModel->updateCustomer($id, $name, $phone, $email, $address, $history_notes);
+            $result = $this->customerModel->updateCustomer($id, $name, $phone, $email, $address, $history_notes);
             
             if ($result) {
                 header('Location: ' . BASE_URL . '?act=admin-customers');
@@ -261,15 +264,15 @@ class QuanTriController
             }
         }
         
-        $customer = $this->khachHangModel->getCustomerById($id);
-        require_once './views/quantri/customers/edit.php';
+        $customer = $this->customerModel->getCustomerById($id);
+        require_once './views/admin/customers/edit.php';
     }
 
     public function deleteCustomer()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         $id = $_GET['id'];
-        $this->khachHangModel->deleteCustomer($id);
+        $this->customerModel->deleteCustomer($id);
         header('Location: ' . BASE_URL . '?act=admin-customers');
         exit();
     }
@@ -277,23 +280,23 @@ class QuanTriController
     // Quản lý Departures - chỉ admin và super admin
     public function listDepartures()
     {
-        XacThucController::checkSuperAdminPermission();
-        $departures = $this->khoiHanhModel->getAllDepartures();
-        require_once './views/quantri/departures/list.php';
+        XacThucController::checkAdminPermission();
+        $departures = $this->departureModel->getAllDepartures();
+        require_once './views/admin/departures/list.php';
     }
 
     // Quản lý Tour Guides - chỉ admin và super admin
     public function listTourGuides()
     {
-        XacThucController::checkSuperAdminPermission();
-        $tourGuides = $this->huongDanVienModel->getAllTourGuides();
-        require_once './views/quantri/tour_guides/list.php';
+        XacThucController::checkAdminPermission();
+        $tourGuides = $this->tourGuideModel->getAllTourGuides();
+        require_once './views/admin/tour_guides/list.php';
     }
 
     // Workflow Management
     public function workflowManagement()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         // Include WorkflowModel
         if (!class_exists('WorkflowModel')) {
@@ -321,12 +324,12 @@ class QuanTriController
         // Get available guides for assignment
         $available_guides = $workflowModel->getAvailableGuides();
         
-        require_once './views/quantri/workflow_management.php';
+        require_once './views/admin/workflow_management.php';
     }
     
     public function approveRequest()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
@@ -353,7 +356,7 @@ class QuanTriController
     
     public function rejectRequest()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
@@ -381,7 +384,7 @@ class QuanTriController
     
     public function assignTour()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
@@ -415,23 +418,23 @@ class QuanTriController
     // Hiển thị danh sách booking assignments
     public function bookingAssignments()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $user_id = $_SESSION['user']['id'];
         $role = $_SESSION['user']['role'];
         
         // Admin chỉ xem assignments do mình tạo, Super Admin xem tất cả
         $assigned_by = ($role === 'super_admin') ? null : $user_id;
-        $assignments = $this->phanCongDatTourModel->getBookingAssignmentsByAdmin($assigned_by);
-        $stats = $this->phanCongDatTourModel->getBookingAssignmentStats($user_id, $role);
+        $assignments = $this->bookingAssignmentModel->getBookingAssignmentsByAdmin($assigned_by);
+        $stats = $this->bookingAssignmentModel->getBookingAssignmentStats($user_id, $role);
         
-        require_once './views/quantri/booking_assignments/list.php';
+        require_once './views/admin/booking_assignments/list.php';
     }
 
     // Form gửi booking cho HDV
     public function assignBookingForm()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $booking_id = $_GET['booking_id'] ?? null;
         if (!$booking_id) {
@@ -440,22 +443,22 @@ class QuanTriController
         }
         
         // Lấy thông tin booking
-        $booking = $this->datTourModel->getBookingById($booking_id);
+        $booking = $this->bookingModel->getBookingById($booking_id);
         if (!$booking) {
             header('Location: ?act=admin-bookings');
             exit;
         }
         
         // Lấy danh sách HDV có thể phân công
-        $availableGuides = $this->huongDanVienModel->getAvailableGuides();
+        $availableGuides = $this->tourGuideModel->getAvailableGuides();
         
-        require_once './views/quantri/booking_assignments/assign_form.php';
+        require_once './views/admin/booking_assignments/assign_form.php';
     }
 
     // Xử lý gửi booking cho HDV
     public function processBookingAssignment()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $booking_id = $_POST['booking_id'];
@@ -466,7 +469,7 @@ class QuanTriController
             $assigned_by = $_SESSION['user']['id'];
             
             // Kiểm tra xem booking đã được giao cho HDV này chưa
-            $existingAssignments = $this->phanCongDatTourModel->getBookingAssignmentsForGuide($guide_id);
+            $existingAssignments = $this->bookingAssignmentModel->getBookingAssignmentsForGuide($guide_id);
             foreach ($existingAssignments as $assignment) {
                 if ($assignment['booking_id'] == $booking_id && in_array($assignment['status'], ['pending', 'accepted'])) {
                     $_SESSION['error'] = 'Booking này đã được giao cho HDV này rồi!';
@@ -475,7 +478,7 @@ class QuanTriController
                 }
             }
             
-            $result = $this->phanCongDatTourModel->assignBookingToGuide(
+            $result = $this->bookingAssignmentModel->assignBookingToGuide(
                 $booking_id, $guide_id, $assigned_by, $notes, $deadline, $priority
             );
             
@@ -495,7 +498,7 @@ class QuanTriController
     // Xem chi tiết booking assignment
     public function viewBookingAssignment()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $assignment_id = $_GET['id'] ?? null;
         if (!$assignment_id) {
@@ -503,7 +506,7 @@ class QuanTriController
             exit;
         }
         
-        $assignment = $this->phanCongDatTourModel->getBookingAssignmentById($assignment_id);
+        $assignment = $this->bookingAssignmentModel->getBookingAssignmentById($assignment_id);
         if (!$assignment) {
             header('Location: ?act=admin-booking-assignments');
             exit;
@@ -515,26 +518,26 @@ class QuanTriController
             exit;
         }
         
-        require_once './views/quantri/booking_assignments/view.php';
+        require_once './views/admin/booking_assignments/view.php';
     }
 
     // Hủy booking assignment
     public function cancelBookingAssignment()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $assignment_id = $_POST['assignment_id'];
             $cancelled_by = $_SESSION['user']['id'];
             
             // Kiểm tra quyền hủy
-            $assignment = $this->phanCongDatTourModel->getBookingAssignmentById($assignment_id);
+            $assignment = $this->bookingAssignmentModel->getBookingAssignmentById($assignment_id);
             if (!$assignment || ($_SESSION['user']['role'] !== 'super_admin' && $assignment['assigned_by'] != $_SESSION['user']['id'])) {
                 echo json_encode(['success' => false, 'message' => 'Không có quyền hủy assignment này']);
                 exit;
             }
             
-            $result = $this->phanCongDatTourModel->cancelBookingAssignment($assignment_id, $cancelled_by);
+            $result = $this->bookingAssignmentModel->cancelBookingAssignment($assignment_id, $cancelled_by);
             
             if ($result) {
                 echo json_encode(['success' => true, 'message' => 'Đã hủy booking assignment thành công']);
@@ -550,15 +553,231 @@ class QuanTriController
     // Lấy thống kê booking assignments cho API
     public function getBookingAssignmentStats()
     {
-        XacThucController::checkSuperAdminPermission();
+        XacThucController::checkAdminPermission();
         
         $user_id = $_SESSION['user']['id'];
         $role = $_SESSION['user']['role'];
         
-        $stats = $this->phanCongDatTourModel->getBookingAssignmentStats($user_id, $role);
+        $stats = $this->bookingAssignmentModel->getBookingAssignmentStats($user_id, $role);
         
         header('Content-Type: application/json');
         echo json_encode($stats);
+        exit;
+    }
+
+    // ==================== USER MANAGEMENT ====================
+    
+    // Hiển thị danh sách tài khoản (chỉ super admin)
+    public function listUsers()
+    {
+        // Kiểm tra quyền super admin
+        if ($_SESSION['user']['role'] !== 'super_admin') {
+            $_SESSION['error'] = 'Bạn không có quyền truy cập chức năng này!';
+            header('Location: ?act=admin-dashboard');
+            exit;
+        }
+
+        // Lấy tham số search và filter
+        $search = $_GET['search'] ?? '';
+        $role = $_GET['role'] ?? '';
+        $status = $_GET['status'] ?? '';
+        $page = $_GET['page'] ?? 1;
+        
+        $users = $this->userModel->getAllUsers($page, 10, $search, $role, $status);
+        require_once './views/quantri/users/list.php';
+    }
+
+    // Hiển thị form thêm tài khoản mới
+    public function addUser()
+    {
+        // Kiểm tra quyền super admin
+        if ($_SESSION['user']['role'] !== 'super_admin') {
+            $_SESSION['error'] = 'Bạn không có quyền truy cập chức năng này!';
+            header('Location: ?act=admin-dashboard');
+            exit;
+        }
+
+        require_once './views/quantri/users/add.php';
+    }
+
+    // Xử lý thêm tài khoản mới
+    public function createUser()
+    {
+        // Kiểm tra quyền super admin
+        if ($_SESSION['user']['role'] !== 'super_admin') {
+            $_SESSION['error'] = 'Bạn không có quyền truy cập chức năng này!';
+            header('Location: ?act=admin-dashboard');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $username = trim($_POST['username']);
+            $password = trim($_POST['password']);
+            $email = trim($_POST['email']);
+            $fullName = trim($_POST['full_name']);
+            $role = $_POST['role'];
+
+            // Validation
+            if (empty($username) || empty($password) || empty($email) || empty($fullName)) {
+                $_SESSION['error'] = 'Vui lòng điền đầy đủ thông tin bắt buộc!';
+                header('Location: ?act=admin-user-add');
+                exit;
+            }
+
+            // Kiểm tra username đã tồn tại
+            if ($this->userModel->usernameExists($username)) {
+                $_SESSION['error'] = 'Tên đăng nhập đã tồn tại!';
+                header('Location: ?act=admin-user-add');
+                exit;
+            }
+
+            // Kiểm tra email đã tồn tại
+            if ($this->userModel->emailExists($email)) {
+                $_SESSION['error'] = 'Email đã tồn tại!';
+                header('Location: ?act=admin-user-add');
+                exit;
+            }
+
+            // Avatar đã được thay thế bằng icon dựa trên role - không cần upload
+            $avatar = '';
+
+            $userData = [
+                'username' => $username,
+                'password' => $password,
+                'email' => $email,
+                'full_name' => $fullName,
+                'role' => $role,
+                'avatar' => $avatar
+            ];
+
+            if ($this->userModel->createUser($userData)) {
+                $_SESSION['success'] = 'Tạo tài khoản thành công!';
+                header('Location: ?act=admin-users');
+            } else {
+                $_SESSION['error'] = 'Có lỗi xảy ra khi tạo tài khoản!';
+                header('Location: ?act=admin-user-add');
+            }
+            exit;
+        }
+    }
+
+    // Hiển thị form chỉnh sửa tài khoản
+    public function editUser()
+    {
+        // Kiểm tra quyền super admin
+        if ($_SESSION['user']['role'] !== 'super_admin') {
+            $_SESSION['error'] = 'Bạn không có quyền truy cập chức năng này!';
+            header('Location: ?act=admin-dashboard');
+            exit;
+        }
+
+        $id = $_GET['id'] ?? 0;
+        $user = $this->userModel->getUserById($id);
+        
+        if (!$user) {
+            $_SESSION['error'] = 'Không tìm thấy tài khoản!';
+            header('Location: ?act=admin-users');
+            exit;
+        }
+
+        require_once './views/quantri/users/edit.php';
+    }
+
+    // Xử lý cập nhật tài khoản
+    public function updateUser()
+    {
+        // Kiểm tra quyền super admin
+        if ($_SESSION['user']['role'] !== 'super_admin') {
+            $_SESSION['error'] = 'Bạn không có quyền truy cập chức năng này!';
+            header('Location: ?act=admin-dashboard');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $id = $_POST['id'];
+            $email = trim($_POST['email']);
+            $fullName = trim($_POST['full_name']);
+            $password = trim($_POST['password']);
+
+            // Validation
+            if (empty($email) || empty($fullName)) {
+                $_SESSION['error'] = 'Vui lòng điền đầy đủ thông tin bắt buộc!';
+                header('Location: ?act=admin-user-edit&id=' . $id);
+                exit;
+            }
+
+            // Kiểm tra email đã tồn tại (trừ user hiện tại)
+            if ($this->userModel->emailExists($email, $id)) {
+                $_SESSION['error'] = 'Email đã tồn tại!';
+                header('Location: ?act=admin-user-edit&id=' . $id);
+                exit;
+            }
+
+            $userData = [
+                'email' => $email,
+                'full_name' => $fullName,
+                'role' => $role
+            ];
+
+            // Thêm password nếu có
+            if (!empty($password)) {
+                $userData['password'] = $password;
+            }
+
+            // Avatar đã được thay thế bằng icon - không cần xử lý upload
+
+            if ($this->userModel->updateUser($id, $userData)) {
+                $_SESSION['success'] = 'Cập nhật tài khoản thành công!';
+                header('Location: ?act=admin-users');
+            } else {
+                $_SESSION['error'] = 'Có lỗi xảy ra khi cập nhật tài khoản!';
+                header('Location: ?act=admin-user-edit&id=' . $id);
+            }
+            exit;
+        }
+    }
+
+    // Xóa tài khoản
+    public function deleteUser()
+    {
+        // Kiểm tra quyền super admin
+        if ($_SESSION['user']['role'] !== 'super_admin') {
+            $_SESSION['error'] = 'Bạn không có quyền truy cập chức năng này!';
+            header('Location: ?act=admin-dashboard');
+            exit;
+        }
+
+        $id = $_GET['id'] ?? 0;
+        
+        if ($this->userModel->deleteUser($id)) {
+            $_SESSION['success'] = 'Xóa tài khoản thành công!';
+        } else {
+            $_SESSION['error'] = 'Có lỗi xảy ra khi xóa tài khoản!';
+        }
+
+        header('Location: ?act=admin-users');
+        exit;
+    }
+
+    // Thay đổi trạng thái tài khoản
+    public function toggleUserStatus()
+    {
+        // Kiểm tra quyền super admin
+        if ($_SESSION['user']['role'] !== 'super_admin') {
+            $_SESSION['error'] = 'Bạn không có quyền truy cập chức năng này!';
+            header('Location: ?act=admin-dashboard');
+            exit;
+        }
+
+        $id = $_GET['id'] ?? 0;
+        
+        if ($this->userModel->toggleUserStatus($id)) {
+            $_SESSION['success'] = 'Thay đổi trạng thái tài khoản thành công!';
+        } else {
+            $_SESSION['error'] = 'Có lỗi xảy ra khi thay đổi trạng thái tài khoản!';
+        }
+
+        header('Location: ?act=admin-users');
         exit;
     }
 }

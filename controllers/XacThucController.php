@@ -51,7 +51,7 @@ class XacThucController
                         'email' => $result['email'],
                         'full_name' => $result['full_name'],
                         'avatar' => $result['avatar'],
-                        'role' => $user['role']
+                        'role' => $result['role']
                     ];
                     
                     header('Location: ' . BASE_URL . '?act=admin-dashboard');
@@ -62,7 +62,7 @@ class XacThucController
             }
 
             // Nếu có lỗi, hiển thị lại form với thông báo lỗi
-            require_once './views/auth/login.php';
+            require_once './views/xacthuc/login.php';
         } else {
             $this->showLogin();
         }
@@ -101,7 +101,7 @@ class XacThucController
     public function showRegister()
     {
         self::checkSuperAdminPermission();
-        require_once './views/auth/register.php';
+        require_once './views/xacthuc/register.php';
     }
 
     // Xử lý đăng ký (chỉ super admin)
@@ -142,7 +142,7 @@ class XacThucController
                 }
             }
 
-            require_once './views/auth/register.php';
+            require_once './views/xacthuc/register.php';
         } else {
             $this->showRegister();
         }

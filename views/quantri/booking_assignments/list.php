@@ -15,73 +15,6 @@
         </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4 stats-cards-row">
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h5 class="card-title text-white mb-1"><?= $stats['total_assignments'] ?? 0 ?></h5>
-                            <p class="card-text mb-0">Tổng assignments</p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-tasks fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h5 class="card-title text-white mb-1"><?= $stats['pending_assignments'] ?? 0 ?></h5>
-                            <p class="card-text mb-0">Chờ phản hồi</p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-clock fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h5 class="card-title text-white mb-1"><?= $stats['accepted_assignments'] ?? 0 ?></h5>
-                            <p class="card-text mb-0">Đã chấp nhận</p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h5 class="card-title text-white mb-1"><?= $stats['declined_assignments'] ?? 0 ?></h5>
-                            <p class="card-text mb-0">Đã từ chối</p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-times-circle fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Content -->
     <div class="row">
         <div class="col-12">
@@ -107,32 +40,32 @@
                         </div>
                     <?php endif; ?>
 
-                    <!-- Filters -->
-                    <div class="filter-section">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Trạng thái</label>
-                                <select class="form-select" id="statusFilter">
-                                    <option value="">Tất cả trạng thái</option>
+                    <!-- Compact Filters -->
+                    <div class="filter-section mb-3">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold small">Trạng thái</label>
+                                <select class="form-select form-select-sm" id="statusFilter">
+                                    <option value="">Tất cả</option>
                                     <option value="pending">Chờ phản hồi</option>
                                     <option value="accepted">Đã chấp nhận</option>
                                     <option value="declined">Đã từ chối</option>
                                     <option value="cancelled">Đã hủy</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Mức độ ưu tiên</label>
-                                <select class="form-select" id="priorityFilter">
-                                    <option value="">Tất cả mức độ</option>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold small">Mức độ ưu tiên</label>
+                                <select class="form-select form-select-sm" id="priorityFilter">
+                                    <option value="">Tất cả</option>
                                     <option value="urgent">Khẩn cấp</option>
                                     <option value="high">Cao</option>
                                     <option value="medium">Trung bình</option>
                                     <option value="low">Thấp</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Tìm kiếm</label>
-                                <div class="input-group">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold small">Tìm kiếm</label>
+                                <div class="input-group input-group-sm">
                                     <input type="text" class="form-control" id="searchInput" placeholder="Booking code, tên khách hàng, HDV...">
                                     <button class="btn btn-outline-secondary" type="button" id="searchBtn">
                                         <i class="fas fa-search"></i>
@@ -305,26 +238,6 @@
     </div>
 </div>
 
-<!-- Cancel Assignment Modal -->
-<div class="modal fade" id="cancelAssignmentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Hủy Booking Assignment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc chắn muốn hủy booking assignment này không?</p>
-                <p class="text-muted">HDV sẽ nhận được thông báo về việc hủy này.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-danger" id="confirmCancelAssignment">Hủy Assignment</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const statusFilter = document.getElementById('statusFilter');
@@ -361,55 +274,6 @@ document.addEventListener('DOMContentLoaded', function() {
     priorityFilter.addEventListener('change', filterTable);
     searchInput.addEventListener('input', filterTable);
     document.getElementById('searchBtn').addEventListener('click', filterTable);
-    
-    // Cancel assignment functionality
-    let assignmentIdToCancel = null;
-    
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.cancel-assignment-btn')) {
-            const btn = e.target.closest('.cancel-assignment-btn');
-            assignmentIdToCancel = btn.getAttribute('data-assignment-id');
-            const modal = new bootstrap.Modal(document.getElementById('cancelAssignmentModal'));
-            modal.show();
-        }
-    });
-    
-    document.getElementById('confirmCancelAssignment').addEventListener('click', function() {
-        if (assignmentIdToCancel) {
-            // Show loading overlay
-            showLoadingOverlay();
-            
-            fetch('?act=cancel-booking-assignment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'assignment_id=' + assignmentIdToCancel
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoadingOverlay();
-                if (data.success) {
-                    // Show success message
-                    showAlert('success', 'Assignment đã được hủy thành công!');
-                    // Reload page after 1 second
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    showAlert('error', 'Lỗi: ' + data.message);
-                }
-            })
-            .catch(error => {
-                hideLoadingOverlay();
-                console.error('Error:', error);
-                showAlert('error', 'Có lỗi xảy ra khi hủy assignment');
-            });
-        }
-        
-        const modal = bootstrap.Modal.getInstance(document.getElementById('cancelAssignmentModal'));
-        modal.hide();
-    });
     
     // Helper functions
     function showLoadingOverlay() {

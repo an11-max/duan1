@@ -14,10 +14,10 @@
     <button class="mobile-menu-toggle" id="mobileMenuToggle">
         <i class="fas fa-bars"></i>
     </button>
-    
+
     <!-- Mobile Overlay -->
     <div class="mobile-overlay" id="mobileOverlay"></div>
-    
+
     <div class="admin-wrapper">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -27,7 +27,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <!-- User Profile Section -->
             <div class="user-profile">
                 <div class="user-avatar">
@@ -66,7 +66,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <nav class="sidebar-nav">
                 <ul>
                     <li>
@@ -75,46 +75,15 @@
                             <i class="fas fa-dashboard"></i> Dashboard
                         </a>
                     </li>
-                    
-                    <!-- Tours - tất cả role đều xem được -->
+
+                    <!-- Admin và Super Admin có đầy đủ chức năng -->
+                    <?php if (in_array($_SESSION['user']['role'], ['admin', 'super_admin'])): ?>
                     <li>
                         <a href="<?= BASE_URL ?>?act=admin-tours"
                             class="<?= ($_GET['act'] ?? '') == 'admin-tours' ? 'active' : '' ?>">
-                            <i class="fas fa-map-marked-alt"></i> 
-                            <?= $_SESSION['user']['role'] == 'tour_guide' ? 'Xem Tours' : 'Quản lý Tours' ?>
+                            <i class="fas fa-map-marked-alt"></i> Quản lý Tours
                         </a>
                     </li>
-                    
-                    <?php if ($_SESSION['user']['role'] == 'tour_guide'): ?>
-                    <!-- Menu dành riêng cho HDV -->
-                    <li>
-                        <a href="<?= BASE_URL ?>?act=guide_assignments"
-                            class="<?= ($_GET['act'] ?? '') == 'guide_assignments' ? 'active' : '' ?>">
-                            <i class="fas fa-tasks"></i> Tour Assignments
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>?act=guide_schedule"
-                            class="<?= ($_GET['act'] ?? '') == 'guide_schedule' ? 'active' : '' ?>">
-                            <i class="fas fa-calendar-check"></i> Lịch trình Tours
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>?act=guide-booking-assignments"
-                            class="<?= strpos($_GET['act'] ?? '', 'guide-booking-assignment') !== false ? 'active' : '' ?>">
-                            <i class="fas fa-clipboard-list"></i> Booking Assignments
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>?act=guide-notifications"
-                            class="<?= ($_GET['act'] ?? '') == 'guide-notifications' ? 'active' : '' ?>">
-                            <i class="fas fa-bell"></i> Thông báo
-                        </a>
-                    </li>
-                    <?php endif; ?>
-                    
-                    <?php if (in_array($_SESSION['user']['role'], ['admin', 'super_admin'])): ?>
-                    <!-- Chỉ Admin và Super Admin -->
                     <li>
                         <a href="<?= BASE_URL ?>?act=admin-bookings"
                             class="<?= ($_GET['act'] ?? '') == 'admin-bookings' ? 'active' : '' ?>">
@@ -145,18 +114,52 @@
                             <i class="fas fa-user-tie"></i> Quản lý HDV
                         </a>
                     </li>
-                    <?php endif; ?>
                     
+                    <!-- Chỉ Super Admin mới có quyền quản lý tài khoản -->
                     <?php if ($_SESSION['user']['role'] == 'super_admin'): ?>
-                    <!-- Chỉ Super Admin -->
                     <li>
-                        <a href="<?= BASE_URL ?>?act=user-list"
-                            class="<?= ($_GET['act'] ?? '') == 'user-list' ? 'active' : '' ?>">
-                            <i class="fas fa-user-cog"></i> Quản lý Tài khoản
+                        <a href="<?= BASE_URL ?>?act=admin-users"
+                            class="<?= in_array(($_GET['act'] ?? ''), ['admin-users', 'admin-user-add', 'admin-user-edit']) ? 'active' : '' ?>">
+                            <i class="fas fa-users-cog"></i> Quản lý Tài khoản
                         </a>
                     </li>
                     <?php endif; ?>
-                    
+                    <?php endif; ?>
+
+                    <?php if ($_SESSION['user']['role'] == 'tour_guide'): ?>
+                    <!-- Menu dành riêng cho HDV -->
+                    <li>
+                        <a href="<?= BASE_URL ?>?act=admin-tours"
+                            class="<?= ($_GET['act'] ?? '') == 'admin-tours' ? 'active' : '' ?>">
+                            <i class="fas fa-map-marked-alt"></i> Xem Tours
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= BASE_URL ?>?act=guide_assignments"
+                            class="<?= ($_GET['act'] ?? '') == 'guide_assignments' ? 'active' : '' ?>">
+                            <i class="fas fa-tasks"></i> Tour Assignments
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= BASE_URL ?>?act=guide_schedule"
+                            class="<?= ($_GET['act'] ?? '') == 'guide_schedule' ? 'active' : '' ?>">
+                            <i class="fas fa-calendar-check"></i> Lịch trình Tours
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= BASE_URL ?>?act=guide-booking-assignments"
+                            class="<?= strpos($_GET['act'] ?? '', 'guide-booking-assignment') !== false ? 'active' : '' ?>">
+                            <i class="fas fa-clipboard-list"></i> Booking Assignments
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= BASE_URL ?>?act=guide-notifications"
+                            class="<?= ($_GET['act'] ?? '') == 'guide-notifications' ? 'active' : '' ?>">
+                            <i class="fas fa-bell"></i> Thông báo
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
                     <!-- Logout -->
                     <li class="logout-item">
                         <a href="<?= BASE_URL ?>?act=logout" onclick="return confirm('Bạn có chắc muốn đăng xuất?')">

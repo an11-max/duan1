@@ -10,6 +10,7 @@ require_once './commons/function.php'; // Hàm hỗ trợ
 
 // Require toàn bộ file Controllers
 require_once './controllers/QuanTriController.php';
+require_once './controllers/AdminController.php';
 require_once './controllers/XacThucController.php';
 require_once './controllers/HuongDanVienController.php';
 
@@ -21,6 +22,7 @@ require_once './models/KhachHangModel.php';
 require_once './models/KhoiHanhModel.php';
 require_once './models/HuongDanVienModel.php';
 require_once './models/NguoiDungModel.php';
+require_once './models/UserModel.php';
 require_once './models/QuyTrinhModel.php';
 
 // Route
@@ -110,6 +112,15 @@ $result = match ($act) {
     'admin-booking-assignment-detail' => (new QuanTriController())->viewBookingAssignment(),
     'cancel-booking-assignment' => (new QuanTriController())->cancelBookingAssignment(),
     'admin-get-booking-assignment-stats' => (new QuanTriController())->getBookingAssignmentStats(),
+
+    // User Management Routes (Super Admin only)
+    'admin-users' => (new AdminController())->listUsers(),
+    'admin-user-add' => (new AdminController())->addUser(),
+    'admin-user-create' => (new AdminController())->createUser(),
+    'admin-user-edit' => (new AdminController())->editUser(),
+    'admin-user-update' => (new AdminController())->updateUser(),
+    'admin-user-delete' => (new AdminController())->deleteUser(),
+    'admin-user-toggle-status' => (new AdminController())->toggleUserStatus(),
 
     default => (new XacThucController())->showLogin(),
 };

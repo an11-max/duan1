@@ -147,7 +147,7 @@ class NguoiDungModel
         try {
             $offset = ($page - 1) * $limit;
             
-            $sql = "SELECT id, username, email, full_name, role, status, created_at, last_login, avatar FROM users WHERE 1=1";
+            $sql = "SELECT id, username, email, full_name, role, status, created_at, avatar FROM users WHERE 1=1";
             $params = [];
             
             if (!empty($search)) {
@@ -165,7 +165,7 @@ class NguoiDungModel
                 $params[':status'] = $status;
             }
             
-            $sql .= " ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
+            $sql .= " ORDER BY created_at DESC LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
             
             $stmt = $this->conn->prepare($sql);
             
@@ -173,8 +173,6 @@ class NguoiDungModel
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value);
             }
-            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             
             $stmt->execute();
             return $stmt->fetchAll();
